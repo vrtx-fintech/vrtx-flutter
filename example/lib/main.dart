@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:vrtx_flutter/vrtx_flutter.dart';
-
-import 'local_config.dart';
+import 'package:vrtx_flutter_example/local_config.dart';
 
 void main() => runApp(const ExampleApp());
 
+/// Root widget for the Vrtx Flutter example app.
 class ExampleApp extends StatelessWidget {
+  /// Creates an [ExampleApp].
   const ExampleApp({super.key});
 
   @override
@@ -18,7 +19,9 @@ class ExampleApp extends StatelessWidget {
   }
 }
 
+/// Landing screen demonstrating the Vrtx Flutter SDK.
 class HomeScreen extends StatefulWidget {
+  /// Creates a [HomeScreen].
   const HomeScreen({super.key});
 
   @override
