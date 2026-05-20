@@ -253,7 +253,7 @@ class _LanguageRow extends StatelessWidget {
             child: Switch(
               value: !isEnglish,
               onChanged: (value) => onChanged(!value),
-              activeColor: Colors.white,
+              activeThumbColor: Colors.white,
               activeTrackColor: const Color(0xFFDDDDDD),
               inactiveThumbColor: Colors.white,
               inactiveTrackColor: const Color(0xFFDDDDDD),
