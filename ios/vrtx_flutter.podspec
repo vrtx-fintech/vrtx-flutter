@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.swift_version    = '5.9'
 
   # Vrtx iOS SDK via Swift Package Manager bridge
-  s.dependency 'VRTX', '~> 0.0.14'
+  s.dependency 'VRTX', '~> 0.0.15'
 
   s.dependency 'Flutter'
 end

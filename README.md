@@ -88,8 +88,8 @@ dependencyResolutionManagement {
 
 The Flutter API mirrors the native SDK public enums:
 
-| Parameter     | Enum              | Values                                                 |
-| ------------- | ----------------- | ------------------------------------------------------ |
+| Parameter     | Enum          | Values                                       |
+| ------------- | ------------- | -------------------------------------------- |
 | `environment` | `Environment` | `Environment.sandbox`, `Environment.staging` |
 | `language`    | `Language`    | `Language.english`, `Language.arabic`        |
 | `mode`        | `Mode`        | `Mode.light`, `Mode.dark`                    |
@@ -98,10 +98,10 @@ The Flutter API mirrors the native SDK public enums:
 
 ## Result
 
-| Result    | Dart behavior                                      |
-| --------- | -------------------------------------------------- |
-| Success   | `Vrtx.setup(...)` completes normally              |
-| Error     | `Vrtx.setup(...)` throws a `VrtxError`            |
+| Result  | Dart behavior                          |
+| ------- | -------------------------------------- |
+| Success | `Vrtx.setup(...)` completes normally   |
+| Error   | `Vrtx.setup(...)` throws a `VrtxError` |
 
 `VrtxError` contains a native `status` code and a human-readable `message`.
 

@@ -46,21 +46,21 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
 
         let fontFamily = args["fontFamily"] as? String  // nullable → nil uses SDK default
 
-        let environment: VrtxEnvironment = {
+        let environment: Environment = {
             switch args["environment"] as? String {
             case "staging": return .staging
             default:        return .sandbox
             }
         }()
 
-        let language: VrtxLanguage = {
+        let language: Language = {
             switch args["language"] as? String {
             case "arabic": return .arabic
             default:       return .english
             }
         }()
 
-        let mode: VrtxThemeMode = {
+        let mode: Mode = {
             switch args["mode"] as? String {
             case "dark": return .dark
             default:     return .light
@@ -76,7 +76,7 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
             clientSecret: clientSecret,
             mode:         mode,
             language:     language,
-            fontFamily:   fontFamily,           // nil → SDK default font
+            fontFamily:   fontFamily ?? "",           // nil → SDK default font
             onSuccess: {
                 DispatchQueue.main.async {
                     result(nil)                 // Future completes normally
