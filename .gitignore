@@ -1,15 +1,23 @@
 # Flutter / Dart
 .dart_tool/
+example/.dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 .packages
 build/
+example/build/
 pubspec.lock
+example/pubspec.lock
 
 # Android
 android/.gradle/
 android/build/
 android/local.properties
+example/android/.gradle/
+example/android/local.properties
+example/android/app/debug/
+example/android/app/profile/
+example/android/app/release/
 android/captures/
 android/*.iml
 **/.cxx/
@@ -24,8 +32,12 @@ ios/Flutter/
 
 # IDE
 .idea/
+example/.idea/
 .vscode/
 *.iml
+
+# Example local credentials
+example/lib/local_config.dart
 
 # macOS
 .DS_Store

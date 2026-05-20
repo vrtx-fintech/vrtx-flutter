@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vrtx_flutter/vrtx_flutter.dart';
 
+import 'local_config.dart';
+
 void main() => runApp(const ExampleApp());
 
 class ExampleApp extends StatelessWidget {
@@ -47,15 +49,35 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Language get _language => _isEnglish ? Language.english : Language.arabic;
 
+  Environment get _environment =>
+      vrtxEnvironment == 'staging' ? Environment.staging : Environment.sandbox;
+
   String get _fontFamily =>
       _isEnglish ? _selectedEnglishFont.family : _selectedArabicFont.family;
+
+  String get _title =>
+      _isEnglish ? 'Welcome to\nvrtx Pay' : 'مرحباً بك في\nڤرتكس باي';
+
+  String get _subtitle => _isEnglish
+      ? 'A smarter wallet for everyday payments'
+      : 'محفظة أذكى للمدفوعات اليومية';
+
+  String get _languageLabel => _isEnglish ? 'Language' : 'اللغة';
+
+  String get _englishFontLabel =>
+      _isEnglish ? 'English Font' : 'خط اللغة الإنجليزية';
+
+  String get _arabicFontLabel =>
+      _isEnglish ? 'Arabic Font' : 'خط اللغة العربية';
+
+  String get _buttonLabel => _isEnglish ? 'Get Started' : 'ابدأ الآن';
 
   Future<void> _launchVrtx() async {
     try {
       await Vrtx.setup(
-        clientId: 'YOUR_CLIENT_ID',
-        clientSecret: 'YOUR_CLIENT_SECRET',
-        environment: Environment.sandbox,
+        clientId: vrtxClientId,
+        clientSecret: vrtxClientSecret,
+        environment: _environment,
         language: _language,
         mode: Mode.light,
         fontFamily: _fontFamily,
@@ -75,103 +97,111 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 12),
-                    Container(
-                      width: 106,
-                      height: 106,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF0F0F4),
-                        borderRadius: BorderRadius.circular(14),
+    return Directionality(
+      textDirection: _isEnglish ? TextDirection.ltr : TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 12),
+                      Container(
+                        width: 106,
+                        height: 106,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF0F0F4),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(22),
+                          child: Image.asset('assets/icon.png'),
+                        ),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(22),
-                        child: Image.asset('assets/icon.png'),
+                      const SizedBox(height: 20),
+                      Text(
+                        _title,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: _fontFamily,
+                          fontSize: 21,
+                          fontWeight: FontWeight.w800,
+                          height: 1.08,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Welcome to\nvrtx Pay',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: _selectedEnglishFont.family,
-                        fontSize: 21,
-                        fontWeight: FontWeight.w800,
-                        height: 1.08,
+                      const SizedBox(height: 8),
+                      Text(
+                        _subtitle,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: const Color(0xFF8B8B8B),
+                          fontFamily: _fontFamily,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'A smarter wallet for everyday payments',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF8B8B8B),
-                        fontFamily: _selectedEnglishFont.family,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
+                      const Spacer(),
+                      const Divider(height: 1, color: Color(0xFFE6E6E6)),
+                      _LanguageRow(
+                        label: _languageLabel,
+                        isEnglish: _isEnglish,
+                        fontFamily: _fontFamily,
+                        onChanged: (value) {
+                          setState(() => _isEnglish = value);
+                        },
                       ),
-                    ),
-                    const Spacer(),
-                    const Divider(height: 1, color: Color(0xFFE6E6E6)),
-                    _LanguageRow(
-                      isEnglish: _isEnglish,
-                      onChanged: (value) {
-                        setState(() => _isEnglish = value);
-                      },
-                    ),
-                    _FontDropdownRow(
-                      label: 'English Font',
-                      value: _selectedEnglishFont,
-                      options: _englishFonts,
-                      onChanged: (value) {
-                        if (value == null) return;
-                        setState(() => _selectedEnglishFont = value);
-                      },
-                    ),
-                    _FontDropdownRow(
-                      label: 'Arabic Font',
-                      value: _selectedArabicFont,
-                      options: _arabicFonts,
-                      onChanged: (value) {
-                        if (value == null) return;
-                        setState(() => _selectedArabicFont = value);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 16, 10, 9),
-              child: SizedBox(
-                width: double.infinity,
-                height: 38,
-                child: FilledButton(
-                  onPressed: _launchVrtx,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    shape: const StadiumBorder(),
-                    textStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                    ),
+                      _FontDropdownRow(
+                        label: _englishFontLabel,
+                        value: _selectedEnglishFont,
+                        options: _englishFonts,
+                        labelFontFamily: _fontFamily,
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() => _selectedEnglishFont = value);
+                        },
+                      ),
+                      _FontDropdownRow(
+                        label: _arabicFontLabel,
+                        value: _selectedArabicFont,
+                        options: _arabicFonts,
+                        labelFontFamily: _fontFamily,
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() => _selectedArabicFont = value);
+                        },
+                      ),
+                    ],
                   ),
-                  child: const Text('Get Started'),
                 ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 16, 10, 9),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 38,
+                  child: FilledButton(
+                    onPressed: _launchVrtx,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      shape: const StadiumBorder(),
+                      textStyle: TextStyle(
+                        fontFamily: _fontFamily,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    child: Text(_buttonLabel),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -180,11 +210,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _LanguageRow extends StatelessWidget {
   const _LanguageRow({
+    required this.label,
     required this.isEnglish,
+    required this.fontFamily,
     required this.onChanged,
   });
 
+  final String label;
   final bool isEnglish;
+  final String fontFamily;
   final ValueChanged<bool> onChanged;
 
   @override
@@ -193,11 +227,12 @@ class _LanguageRow extends StatelessWidget {
       height: 43,
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
             child: Text(
-              'Language',
+              label,
               style: TextStyle(
                 color: Colors.black,
+                fontFamily: fontFamily,
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
@@ -252,12 +287,14 @@ class _FontDropdownRow extends StatelessWidget {
     required this.label,
     required this.value,
     required this.options,
+    required this.labelFontFamily,
     required this.onChanged,
   });
 
   final String label;
   final _FontOption value;
   final List<_FontOption> options;
+  final String labelFontFamily;
   final ValueChanged<_FontOption?> onChanged;
 
   @override
@@ -272,8 +309,9 @@ class _FontDropdownRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.black,
+                    fontFamily: labelFontFamily,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
