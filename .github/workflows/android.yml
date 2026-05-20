@@ -1,4 +1,4 @@
-name: CI
+name: Android
 
 on:
   pull_request:
@@ -7,8 +7,8 @@ on:
       - main
 
 jobs:
-  flutter:
-    name: Flutter
+  android:
+    name: Android
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
