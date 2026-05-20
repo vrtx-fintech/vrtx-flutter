@@ -1,0 +1,33 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+pubspec.lock
+
+# Android
+android/.gradle/
+android/build/
+android/local.properties
+android/captures/
+android/*.iml
+**/.cxx/
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/
+**/*.xcworkspace
+**/*.xcuserdata
+**/DerivedData/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# macOS
+.DS_Store
+
+.codegraph

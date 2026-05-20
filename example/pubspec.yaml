@@ -1,0 +1,118 @@
+name: vrtx_flutter_example
+description: Example app for the Vrtx Flutter SDK.
+publish_to: "none"
+version: 0.0.1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  vrtx_flutter:
+    path: ..
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon.png
+    - assets/adaptive-icon.png
+    - assets/splash-icon.png
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/font/inter_regular.ttf
+          weight: 400
+        - asset: assets/font/inter_medium.ttf
+          weight: 500
+        - asset: assets/font/inter_semibold.ttf
+          weight: 600
+        - asset: assets/font/inter_bold.ttf
+          weight: 700
+    - family: Geom
+      fonts:
+        - asset: assets/font/geom_light.ttf
+          weight: 300
+        - asset: assets/font/geom_regular.ttf
+          weight: 400
+        - asset: assets/font/geom_medium.ttf
+          weight: 500
+        - asset: assets/font/geom_semibold.ttf
+          weight: 600
+        - asset: assets/font/geom_bold.ttf
+          weight: 700
+    - family: Jura
+      fonts:
+        - asset: assets/font/jura_light.ttf
+          weight: 300
+        - asset: assets/font/jura_regular.ttf
+          weight: 400
+        - asset: assets/font/jura_medium.ttf
+          weight: 500
+        - asset: assets/font/jura_semibold.ttf
+          weight: 600
+        - asset: assets/font/jura_bold.ttf
+          weight: 700
+    - family: Noto Sans
+      fonts:
+        - asset: assets/font/noto_sans_light.ttf
+          weight: 300
+        - asset: assets/font/noto_sans_regular.ttf
+          weight: 400
+        - asset: assets/font/noto_sans_medium.ttf
+          weight: 500
+        - asset: assets/font/noto_sans_semibold.ttf
+          weight: 600
+        - asset: assets/font/noto_sans_bold.ttf
+          weight: 700
+    - family: JejuGothic
+      fonts:
+        - asset: assets/font/jejugothic_regular.ttf
+          weight: 400
+    - family: Jockey One
+      fonts:
+        - asset: assets/font/jockey_one_regular.ttf
+          weight: 400
+    - family: IBM Plex Sans Arabic
+      fonts:
+        - asset: assets/font/ibm_plex_sans_arabic_light.ttf
+          weight: 300
+        - asset: assets/font/ibm_plex_sans_arabic_regular.ttf
+          weight: 400
+        - asset: assets/font/ibm_plex_sans_arabic_medium.ttf
+          weight: 500
+        - asset: assets/font/ibm_plex_sans_arabic_semibold.ttf
+          weight: 600
+        - asset: assets/font/ibm_plex_sans_arabic_bold.ttf
+          weight: 700
+    - family: Noto Kufi Arabic
+      fonts:
+        - asset: assets/font/noto_kufi_arabic_light.ttf
+          weight: 300
+        - asset: assets/font/noto_kufi_arabic_regular.ttf
+          weight: 400
+        - asset: assets/font/noto_kufi_arabic_medium.ttf
+          weight: 500
+        - asset: assets/font/noto_kufi_arabic_semibold.ttf
+          weight: 600
+        - asset: assets/font/noto_kufi_arabic_bold.ttf
+          weight: 700
+    - family: Noto Naskh Arabic
+      fonts:
+        - asset: assets/font/noto_naskh_arabic_regular.ttf
+          weight: 400
+        - asset: assets/font/noto_naskh_arabic_medium.ttf
+          weight: 500
+        - asset: assets/font/noto_naskh_arabic_semibold.ttf
+          weight: 600
+        - asset: assets/font/noto_naskh_arabic_bold.ttf
+          weight: 700
+    - family: Arslan Wessam B
+      fonts:
+        - asset: assets/font/arslan_wessam_b_regular.ttf
+          weight: 400
