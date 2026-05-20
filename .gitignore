@@ -22,12 +22,29 @@ android/captures/
 android/*.iml
 **/.cxx/
 
-# iOS
+# iOS — plugin (no Flutter app scaffolding lives here)
 ios/Pods/
 ios/.symlinks/
-ios/Flutter/
-**/*.xcworkspace
-**/*.xcuserdata
+# The VRTX.xcframework is fetched on demand by scripts/fetch_vrtx_ios.sh.
+ios/Frameworks/
+
+# iOS — example app (mirrors the Flutter app template defaults)
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/Pods/
+**/ios/Podfile.lock
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/.symlinks/
+**/xcuserdata/
+**/*.xcuserstate
 **/DerivedData/
 
 # IDE

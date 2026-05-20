@@ -85,8 +85,9 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
             onError: { error in
                 DispatchQueue.main.async {
                     result(FlutterError(
-                        code:    error.status,  // → PlatformException.code  in Dart
-                        message: error.message, // → PlatformException.message in Dart
+                        // VrtxSetupError.status is Int; surfaced as a string via PlatformException.code in Dart.
+                        code:    String(error.status),
+                        message: error.message,
                         details: nil
                     ))
                 }

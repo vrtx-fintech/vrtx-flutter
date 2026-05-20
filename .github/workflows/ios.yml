@@ -1,0 +1,60 @@
+name: iOS
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build-example-ios:
+    name: build-example-ios
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # Pin to the latest stable Xcode so the toolchain matches what the
+      # maintainer tests against, rather than the default that ships on the
+      # macos-latest image (which can lag behind Flutter's iOS expectations).
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          cache: true
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          xcrun swift --version
+          flutter --version
+
+      # The VRTX.xcframework is a binary artefact released out-of-band from
+      # this repo; the script downloads the pinned version into ios/Frameworks/
+      # so `pod install` (run transparently by `flutter build`) finds it.
+      - name: Fetch VRTX.xcframework
+        run: ./scripts/fetch_vrtx_ios.sh
+
+      # `example/lib/local_config.dart` is gitignored (it holds developer
+      # credentials). Use the committed `.example.dart` template as a stub so
+      # the example compiles in CI without exposing real secrets.
+      - name: Stub local_config.dart
+        run: cp lib/local_config.example.dart lib/local_config.dart
+        working-directory: example
+
+      - name: Install example dependencies
+        run: flutter pub get
+        working-directory: example
+
+      - name: Build iOS debug app for simulator
+        run: flutter build ios --debug --simulator --no-codesign
+        working-directory: example

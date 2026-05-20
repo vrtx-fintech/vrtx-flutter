@@ -1,0 +1,25 @@
+# Strict lint configuration based on Very Good Ventures' published ruleset.
+# https://pub.dev/packages/very_good_analysis
+include: package:very_good_analysis/analysis_options.10.2.0.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    # Surface TODOs but don't fail the build on them.
+    todo: info
+  exclude:
+    # Generated Flutter scaffolding outside our control.
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "build/**"
+    - "example/build/**"
+    - "example/android/**"
+    - "example/ios/**"
+    # The example's local_config.dart is gitignored; in CI we stub it from
+    # `local_config.example.dart`, which references undefined identifiers
+    # until populated. The example is still type-checked when it's actually
+    # compiled by the platform build jobs.
+    - "example/lib/local_config.dart"

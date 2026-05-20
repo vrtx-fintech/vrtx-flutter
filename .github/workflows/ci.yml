@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          cache: true
+
+      # Plugin package
+      - name: Install plugin dependencies
+        run: flutter pub get
+      - name: Plugin format check
+        run: dart format --output=none --set-exit-if-changed lib
+      - name: Plugin analyze
+        run: flutter analyze lib
+
+      # Example app — analyzed too so the demo doesn't drift from strict lints.
+      # `local_config.dart` is gitignored; stub it from the committed template
+      # so analyzer can resolve `vrtxClientId` etc.
+      - name: Stub example local_config.dart
+        run: cp lib/local_config.example.dart lib/local_config.dart
+        working-directory: example
+      - name: Install example dependencies
+        run: flutter pub get
+        working-directory: example
+      - name: Example format check
+        run: dart format --output=none --set-exit-if-changed lib
+        working-directory: example
+      - name: Example analyze
+        run: flutter analyze lib
+        working-directory: example
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      # Skip cleanly when no `test/` directory exists yet — `flutter test`
+      # exits non-zero in that case, which would gate PRs before any tests
+      # are written.
+      - name: Run tests
+        run: |
+          if [ -d test ]; then
+            flutter test
+          else
+            echo "No test/ directory; skipping."
+          fi
+
+  publish-dry-run:
+    name: Publish dry-run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      # Sanity check that the package is publishable. Does not actually push.
+      - run: flutter pub publish --dry-run

@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  # Cut a release by publishing a GitHub Release whose tag matches the
+  # pubspec.yaml version, e.g. tag `v0.0.1` when pubspec.yaml is at 0.0.1.
+  release:
+    types: [published]
+  # Manual escape hatch — useful for re-running a failed publish or for
+  # publishing a hotfix tag that was created out-of-band.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to publish (e.g. v0.0.1). Must match pubspec.yaml version.'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # The `production` environment must exist in repo Settings → Environments
+    # with at least one required reviewer. That reviewer's manual approval is
+    # the gate that prevents an accidental publish from a tag push.
+    environment:
+      name: production
+      url: https://pub.dev/packages/vrtx_flutter
+    permissions:
+      contents: read
+      # Required for pub.dev OIDC-based automated publishing. Enable on
+      # https://pub.dev/packages/vrtx_flutter/admin under "Automated publishing".
+      # See: https://dart.dev/tools/pub/automated-publishing
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify tag matches pubspec.yaml version
+        run: |
+          tag="${{ github.event.inputs.tag || github.ref_name }}"
+          pkg_version="v$(grep '^version:' pubspec.yaml | awk '{print $2}')"
+          if [ "$tag" != "$pkg_version" ]; then
+            echo "::error::Tag $tag does not match pubspec.yaml version $pkg_version"
+            exit 1
+          fi
+          echo "Releasing $pkg_version"
+
+      - name: Format check
+        run: dart format --output=none --set-exit-if-changed lib
+
+      - name: Analyze
+        run: flutter analyze lib
+
+      - name: Test
+        run: flutter test
+
+      - name: Publish dry-run
+        run: flutter pub publish --dry-run
+
+      - name: Publish to pub.dev
+        run: flutter pub publish --force
