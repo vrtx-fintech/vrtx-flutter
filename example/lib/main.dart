@@ -180,10 +180,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(10, 16, 10, 9),
+                padding: const EdgeInsets.fromLTRB(10, 16, 10, 49),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 38,
+                  height: 48,
                   child: FilledButton(
                     onPressed: _launchVrtx,
                     style: FilledButton.styleFrom(
@@ -192,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       shape: const StadiumBorder(),
                       textStyle: TextStyle(
                         fontFamily: _fontFamily,
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -224,7 +224,7 @@ class _LanguageRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 43,
+      height: 52,
       child: Row(
         children: [
           Expanded(
@@ -233,7 +233,7 @@ class _LanguageRow extends StatelessWidget {
               style: TextStyle(
                 color: Colors.black,
                 fontFamily: fontFamily,
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -248,8 +248,8 @@ class _LanguageRow extends StatelessWidget {
           ),
           const SizedBox(width: 6),
           SizedBox(
-            width: 38,
-            height: 24,
+            width: 46,
+            height: 28,
             child: Switch(
               value: !isEnglish,
               onChanged: (value) => onChanged(!value),
@@ -303,7 +303,7 @@ class _FontDropdownRow extends StatelessWidget {
       children: [
         const Divider(height: 1, color: Color(0xFFE6E6E6)),
         SizedBox(
-          height: 43,
+          height: 52,
           child: Row(
             children: [
               Expanded(
@@ -312,13 +312,13 @@ class _FontDropdownRow extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.black,
                     fontFamily: labelFontFamily,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
               SizedBox(
-                width: 178,
+                width: 196,
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<_FontOption>(
                     value: value,
@@ -343,7 +343,7 @@ class _FontDropdownRow extends StatelessWidget {
                             style: TextStyle(
                               color: Colors.black,
                               fontFamily: option.family,
-                              fontSize: 12,
+                              fontSize: 13,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -359,7 +359,7 @@ class _FontDropdownRow extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.black,
                             fontFamily: option.family,
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
