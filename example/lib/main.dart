@@ -10,7 +10,7 @@ class ExampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Vrtx Flutter Example',
+      title: 'vrtx-flutter Example',
       home: HomeScreen(),
     );
   }

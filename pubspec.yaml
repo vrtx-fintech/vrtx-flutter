@@ -1,5 +1,6 @@
 name: vrtx_flutter
-description: Flutter wrapper for the Vrtx fintech SDK — onboarding, wallet, and card flows for Android and iOS.
+description: The official Flutter SDK for Vrtx — onboarding, wallet, and card flows for your app.
+
 version: 0.0.1
 
 environment:

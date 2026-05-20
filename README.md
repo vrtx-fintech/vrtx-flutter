@@ -1,4 +1,4 @@
-# vrtx_flutter
+# vrtx-flutter
 
 The official Flutter SDK for Vrtx — onboarding, wallet, and card flows for your app.
 
@@ -9,7 +9,7 @@ Add `vrtx_flutter` to your `pubspec.yaml`:
 ```yaml
 dependencies:
   vrtx_flutter:
-    path: ./vrtx_flutter
+    path: ./vrtx-flutter
 ```
 
 Then install dependencies:
