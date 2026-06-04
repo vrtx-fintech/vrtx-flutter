@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Git tag to publish (e.g. v0.0.1). Must match pubspec.yaml version.'
+        description: "Git tag to publish (e.g. v0.0.1). Must match pubspec.yaml version."
         required: true
         type: string
 

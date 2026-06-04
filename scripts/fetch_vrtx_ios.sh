@@ -9,7 +9,7 @@
 # Override VRTX_IOS_VERSION to pin a different release.
 set -euo pipefail
 
-VRTX_IOS_VERSION="${VRTX_IOS_VERSION:-0.0.15}"
+VRTX_IOS_VERSION="${VRTX_IOS_VERSION:-0.0.16}"
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 repo_root="$(cd "$script_dir/.." && pwd)"
