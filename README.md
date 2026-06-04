@@ -30,6 +30,8 @@ try {
     environment: Environment.sandbox,
     language: Language.english,
     mode: Mode.light,
+    externalReference: 'YOUR_EXTERNAL_REFERENCE', // omit when no external reference is needed
+    fontFamily: 'Inter', // omit to use the SDK default per language
   );
 
   print('Vrtx screen opened');
@@ -94,6 +96,7 @@ The Flutter API mirrors the native SDK public enums:
 | `language`    | `Language`    | `Language.english`, `Language.arabic`        |
 | `mode`        | `Mode`        | `Mode.light`, `Mode.dark`                    |
 
+`externalReference` may be passed with an app-provided SDK session reference.
 `fontFamily` may be passed with the name of a font already bundled in the host app.
 
 ## Result

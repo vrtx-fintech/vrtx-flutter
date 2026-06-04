@@ -47,7 +47,7 @@ Override the pinned version with an env var, then rerun the fetch script and
 `pod install`:
 
 ```bash
-VRTX_IOS_VERSION=0.0.15 ./scripts/fetch_vrtx_ios.sh
+VRTX_IOS_VERSION=0.0.16 ./scripts/fetch_vrtx_ios.sh
 cd example/ios && pod install
 ```
 

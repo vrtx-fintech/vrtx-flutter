@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:vrtx_flutter/vrtx_flutter.dart';
 import 'package:vrtx_flutter_example/local_config.dart';
@@ -29,6 +31,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  static final Random _random = Random.secure();
+
   bool _isEnglish = true;
 
   static const List<_FontOption> _englishFonts = [
@@ -83,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
         environment: _environment,
         language: _language,
         mode: Mode.light,
+        externalReference: _generateUuid(),
         fontFamily: _fontFamily,
       );
 
@@ -96,6 +101,21 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }
     }
+  }
+
+  static String _generateUuid() {
+    final bytes = List<int>.generate(16, (_) => _random.nextInt(256));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    final hex = bytes
+        .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
+        .join();
+    return '${hex.substring(0, 8)}-'
+        '${hex.substring(8, 12)}-'
+        '${hex.substring(12, 16)}-'
+        '${hex.substring(16, 20)}-'
+        '${hex.substring(20)}';
   }
 
   @override
