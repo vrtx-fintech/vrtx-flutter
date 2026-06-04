@@ -77,6 +77,7 @@ class VrtxFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         val clientId     = call.argument<String>("clientId")!!
         val clientSecret = call.argument<String>("clientSecret")!!
+        val externalReference = call.argument<String?>("externalReference")
         val fontFamily   = call.argument<String?>("fontFamily")
 
         val environment: Environment = when (call.argument<String>("environment")) {
@@ -106,6 +107,7 @@ class VrtxFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     environment  = environment,
                     language     = language,
                     mode         = mode,
+                    externalReference = externalReference,
                     fontFamily   = composeFontFamily,
                     onSuccess    = {
                         result.success(null)

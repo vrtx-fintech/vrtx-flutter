@@ -44,6 +44,7 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
             return
         }
 
+        let externalReference = args["externalReference"] as? String
         let fontFamily = args["fontFamily"] as? String  // nullable → nil uses SDK default
 
         let environment: Environment = {
@@ -76,6 +77,7 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
             clientSecret: clientSecret,
             mode:         mode,
             language:     language,
+            externalReference: externalReference,
             fontFamily:   fontFamily ?? "",           // nil → SDK default font
             onSuccess: {
                 DispatchQueue.main.async {

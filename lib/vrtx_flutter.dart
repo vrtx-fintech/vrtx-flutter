@@ -76,6 +76,7 @@ class Vrtx {
   /// - [environment]  [Environment.sandbox] or [Environment.staging].
   /// - [language]     [Language.english] or [Language.arabic].
   /// - [mode]         [Mode.light] or [Mode.dark].
+  /// - [externalReference] Optional app-provided SDK session reference.
   /// - [fontFamily]   Optional font-family name already registered in the
   ///                  host app. Pass `null` to use the SDK default.
   static Future<void> setup({
@@ -84,6 +85,7 @@ class Vrtx {
     required Environment environment,
     required Language language,
     required Mode mode,
+    String? externalReference,
     String? fontFamily,
   }) async {
     try {
@@ -93,6 +95,7 @@ class Vrtx {
         'environment': environment.name,
         'language': language.name,
         'mode': mode.name,
+        'externalReference': externalReference,
         'fontFamily': fontFamily,
       });
     } on PlatformException catch (e) {
