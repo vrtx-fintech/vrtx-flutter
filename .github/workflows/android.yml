@@ -48,3 +48,52 @@ jobs:
       - name: Build Android debug APK
         run: flutter build apk --debug
         working-directory: example
+
+  e2e-android:
+    name: e2e-android
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Set up Java
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@5e2ebd065dc2488b7a6ad670704656cbbe1e8f60 # v6.1.1
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          cache: true
+
+      # The integration test only asserts the native bridge round-trips, so the
+      # gitignored credentials file can be a stub (see integration_test/).
+      - name: Stub local_config.dart
+        run: cp lib/local_config.example.dart lib/local_config.dart
+        working-directory: example
+
+      - name: Install example dependencies
+        run: flutter pub get
+        working-directory: example
+
+      # Grant access to /dev/kvm so the emulator runs hardware-accelerated.
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run integration tests on Android emulator
+        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2.37.0
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          working-directory: example
+          script: flutter test integration_test

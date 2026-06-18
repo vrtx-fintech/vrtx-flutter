@@ -58,3 +58,55 @@ jobs:
       - name: Build iOS debug app for simulator
         run: flutter build ios --debug --simulator --no-codesign
         working-directory: example
+
+  e2e-ios:
+    name: e2e-ios
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          cache: true
+
+      - name: Fetch VRTX.xcframework
+        run: ./scripts/fetch_vrtx_ios.sh
+
+      # The integration test only asserts the native bridge round-trips, so the
+      # gitignored credentials file can be a stub (see integration_test/).
+      - name: Stub local_config.dart
+        run: cp lib/local_config.example.dart lib/local_config.dart
+        working-directory: example
+
+      - name: Install example dependencies
+        run: flutter pub get
+        working-directory: example
+
+      # Boot the first available iPhone simulator and remember its UDID so the
+      # integration test runs against a concrete, already-booted device.
+      - name: Boot iOS simulator
+        run: |
+          UDID=$(xcrun simctl list devices available \
+            | grep -m1 -E 'iPhone 1[5-9]' \
+            | grep -oE '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}')
+          if [ -z "$UDID" ]; then
+            echo "No iPhone simulator available" >&2
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "Booting simulator $UDID"
+          xcrun simctl boot "$UDID"
+          echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
+
+      - name: Run integration tests on iOS simulator
+        run: flutter test integration_test -d "$SIM_UDID"
+        working-directory: example
