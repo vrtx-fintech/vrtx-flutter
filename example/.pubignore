@@ -1,0 +1,22 @@
+# Publish-only excludes for the example app.
+#
+# .pubignore REPLACES the .gitignore in its own directory. example/ has no
+# .gitignore of its own, so the repository-root .gitignore still governs the
+# whole tree (build artifacts, credentials, and the iOS xcframework stay out).
+# This file only trims example weight that pub.dev never needs: the package
+# page renders example/lib for the "Example" tab, while the full runnable
+# example — native scaffolding and bundled fonts — lives in the git repository.
+#
+# Dropping these removes ~14 MB of duplicated font binaries and native build
+# files from the published archive.
+
+# Native build scaffolding (Gradle wrapper, Xcode project, generated configs).
+android/
+ios/
+
+# Font catalog and launcher icons, bundled three times across the example.
+assets/
+
+# Defense in depth: never ship example credentials (also covered by the
+# repository-root .gitignore).
+lib/local_config.dart

@@ -4,19 +4,13 @@ The official Flutter SDK for Vrtx — onboarding, wallet, and card flows for you
 
 ## Install
 
-Add `vrtx_flutter` to your `pubspec.yaml`:
-
-```yaml
-dependencies:
-  vrtx_flutter:
-    path: ./vrtx-flutter
-```
-
-Then install dependencies:
+Add the package from [pub.dev](https://pub.dev/packages/vrtx_flutter):
 
 ```bash
-flutter pub get
+flutter pub add vrtx_flutter
 ```
+
+This adds the latest version to your `pubspec.yaml` and runs `flutter pub get`.
 
 ## Quick start
 
@@ -46,8 +40,8 @@ try {
 
 | Requirement | Version |
 | ----------- | ------- |
-| Flutter     | 3.10.0+ |
-| Dart        | 3.0.0+  |
+| Flutter     | 3.44.0+ |
+| Dart        | 3.12.0+ |
 
 ### iOS
 
