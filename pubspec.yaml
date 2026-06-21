@@ -2,6 +2,12 @@ name: vrtx_flutter
 description: The official Flutter SDK for Vrtx — onboarding, wallet, and card flows for your app.
 repository: https://github.com/vrtx-fintech/vrtx-flutter
 issue_tracker: https://github.com/vrtx-fintech/vrtx-flutter/issues
+homepage: https://vrtx.sa
+topics:
+  - sdk
+  - fintech
+  - wallet
+  - onboarding
 
 version: 0.0.1
 
