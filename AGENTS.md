@@ -7,16 +7,17 @@ up automatically — no symlinking or local registry override needed.
 
 ## First-time setup
 
-After cloning, copy the credential template and (on macOS) fetch the iOS
-binary framework:
+After cloning, copy the credential template:
 
 ```bash
 cp example/lib/local_config.example.dart example/lib/local_config.dart
-# macOS only — pulls VRTX.xcframework into ios/Frameworks/
-./scripts/fetch_vrtx_ios.sh
 ```
 
-`example/lib/local_config.dart` and `ios/Frameworks/` are both gitignored.
+`example/lib/local_config.dart` is gitignored. The VRTX iOS SDK is pulled
+automatically by CocoaPods (`pod install`, run transparently by
+`flutter build`) — it is a binary pod published to CocoaPods trunk, declared
+as `s.dependency 'VRTX', '<version>'` in `ios/vrtx_flutter.podspec`. No fetch
+step is needed.
 
 ## After SDK changes
 
@@ -43,15 +44,15 @@ When changing files in `lib/`, `android/`, or `ios/`:
 
 ## Bumping the VRTX iOS SDK
 
-Override the pinned version with an env var, then rerun the fetch script and
-`pod install`:
+Update the pinned version in `ios/vrtx_flutter.podspec`
+(`s.dependency 'VRTX', '<version>'`), then refresh the example's pods:
 
 ```bash
-VRTX_IOS_VERSION=0.0.16 ./scripts/fetch_vrtx_ios.sh
-cd example/ios && pod install
+cd example/ios && pod update VRTX
 ```
 
-Update the default in `scripts/fetch_vrtx_ios.sh` once the bump is confirmed.
+The version must match a release published to CocoaPods trunk
+(<https://github.com/vrtx-fintech/vrtx-ios/releases>).
 
 ## Testing the published package
 

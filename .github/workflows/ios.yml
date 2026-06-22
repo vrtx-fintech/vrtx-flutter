@@ -38,12 +38,6 @@ jobs:
           xcrun swift --version
           flutter --version
 
-      # The VRTX.xcframework is a binary artefact released out-of-band from
-      # this repo; the script downloads the pinned version into ios/Frameworks/
-      # so `pod install` (run transparently by `flutter build`) finds it.
-      - name: Fetch VRTX.xcframework
-        run: ./scripts/fetch_vrtx_ios.sh
-
       # `example/lib/local_config.dart` is gitignored (it holds developer
       # credentials). Use the committed `.example.dart` template as a stub so
       # the example compiles in CI without exposing real secrets.

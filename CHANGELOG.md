@@ -2,7 +2,10 @@
 
 ## 0.0.2
 
-- Maintenance release; no functional changes to the SDK.
+- iOS: pull the VRTX SDK from CocoaPods trunk via `s.dependency 'VRTX'`
+  instead of vendoring a downloaded `VRTX.xcframework`. `pod install` now
+  fetches the binary automatically — no out-of-band download step is needed.
+- No changes to the public Dart API.
 
 ## 0.0.1
 

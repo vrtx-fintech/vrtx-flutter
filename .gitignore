@@ -25,8 +25,6 @@ android/*.iml
 # iOS — plugin (no Flutter app scaffolding lives here)
 ios/Pods/
 ios/.symlinks/
-# The VRTX.xcframework is fetched on demand by scripts/fetch_vrtx_ios.sh.
-ios/Frameworks/
 
 # iOS — example app (mirrors the Flutter app template defaults)
 **/ios/Flutter/.last_build_id
