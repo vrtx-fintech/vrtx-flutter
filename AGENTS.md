@@ -1,9 +1,14 @@
 # Local Testing
 
-Use the `example` app for local validation through the same flow used by real
-consumers. The example depends on the plugin via `path: ..` in
-`example/pubspec.yaml`, so changes in `lib/`, `android/`, or `ios/` are picked
-up automatically — no symlinking or local registry override needed.
+Use the `example` app for validation through the same flow used by real
+consumers. The committed `example/pubspec.yaml` pins the **published**
+version (`vrtx_flutter: ^x.y.z`), so CI builds the example against the real
+pub.dev artifact — exactly what consumers get.
+
+For local iteration on in-tree changes, swap `example/pubspec.yaml` to
+`path: ..` so changes in `lib/`, `android/`, or `ios/` are picked up
+automatically, then run `flutter pub get` in `example/`. Don't commit that
+swap — the committed version constraint is what CI builds against.
 
 ## First-time setup
 
@@ -62,11 +67,13 @@ Before cutting a release, validate that the package can be published:
 flutter pub publish --dry-run
 ```
 
-To exercise the published artifact end-to-end, temporarily swap
-`example/pubspec.yaml` from `path: ..` to the version constraint
-(`vrtx_flutter: ^x.y.z`) and rerun `flutter pub get` in `example/`. Don't
-commit that swap — the in-tree `path:` dependency is what the CI builds
-against.
+The committed `example/pubspec.yaml` already pins the published version, so
+CI exercises the pub.dev artifact end-to-end on every run. After publishing a
+new version, bump that constraint to match and run `flutter pub get` in
+`example/`.
+
+To test unpublished in-tree changes locally, temporarily swap the constraint
+to `path: ..` and rerun `flutter pub get` — but don't commit that swap.
 
 ## Testing notes
 
