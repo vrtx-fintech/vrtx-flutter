@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.2
+
+- Maintenance release; no functional changes to the SDK.
+
 ## 0.0.1
 
 - Initial release of the Vrtx Flutter SDK.
