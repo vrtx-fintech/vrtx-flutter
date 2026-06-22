@@ -1,12 +1,21 @@
 name: Release
 
 on:
-  # Cut a release by publishing a GitHub Release whose tag matches the
-  # pubspec.yaml version, e.g. tag `v0.0.1` when pubspec.yaml is at 0.0.1.
-  release:
-    types: [published]
+  # Cut a release by pushing a tag whose name matches the pubspec.yaml
+  # version, e.g. `git tag v0.0.1 && git push origin v0.0.1` when
+  # pubspec.yaml is at 0.0.1. pub.dev automated publishing only trusts the
+  # OIDC `push` and `workflow_dispatch` events — GitHub `release` events
+  # are NOT supported — so the tag push is what authorizes the publish.
+  # See: https://dart.dev/tools/pub/automated-publishing
+  push:
+    tags:
+      - "v*"
   # Manual escape hatch — useful for re-running a failed publish or for
-  # publishing a hotfix tag that was created out-of-band.
+  # publishing a hotfix tag created out-of-band. NOTE: OIDC publishing from
+  # workflow_dispatch is disabled on pub.dev, so this path only publishes if
+  # that event is enabled on the package admin and the run is dispatched
+  # from the tag ref. To simply retry, prefer "Re-run jobs" on the tag-push
+  # run — it preserves the tag ref and `push` event so OIDC still validates.
   workflow_dispatch:
     inputs:
       tag:
