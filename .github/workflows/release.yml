@@ -80,3 +80,53 @@ jobs:
 
       - name: Publish to pub.dev
         run: flutter pub publish --force
+
+      # Announce the release in Slack, matching the iOS/Android SDK release
+      # workflows. Failures are downgraded to warnings so a Slack outage or a
+      # missing webhook never fails an otherwise successful publish.
+      - name: Notify Slack
+        env:
+          WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${WEBHOOK}" ]; then
+            echo "::warning::SLACK_WEBHOOK_URL is not set; skipping release announcement."
+            exit 0
+          fi
+          VERSION="${TAG#v}"
+          TITLE="Flutter SDK ${VERSION} Available"
+          # The pub.dev-published CHANGELOG entry doubles as the announcement
+          # body, so notes are written once per release.
+          NOTES="$(awk -v ver="${VERSION}" \
+            '$0 == "## " ver {flag=1; next} /^## /{flag=0} flag' CHANGELOG.md)"
+          if [ -z "${NOTES}" ]; then
+            NOTES="See the changelog on pub.dev for details."
+          fi
+          # Slack section blocks reject text over 3000 characters.
+          NOTES="${NOTES:0:2900}"
+          PUB_URL="https://pub.dev/packages/vrtx_flutter/versions/${VERSION}"
+          TAG_URL="https://github.com/${REPO}/tree/${TAG}"
+          CONTEXT="<${PUB_URL}|pub.dev ${VERSION}> · <${TAG_URL}|Tag ${TAG}>"
+          PAYLOAD=$(jq -n \
+            --arg title "${TITLE}" \
+            --arg notes "${NOTES}" \
+            --arg context "${CONTEXT}" \
+            '{
+              blocks: [
+                {type: "header", text: {type: "plain_text", text: $title}},
+                {type: "section", text: {type: "mrkdwn", text: $notes}},
+                {type: "context", elements: [{type: "mrkdwn", text: $context}]}
+              ]
+            }')
+          response=$(curl -sS --fail-with-body -X POST \
+            -H 'Content-Type: application/json' \
+            --data "${PAYLOAD}" "${WEBHOOK}") || {
+            echo "::warning::Slack webhook curl failed: ${response}"
+            exit 0
+          }
+          if [ "${response}" != "ok" ]; then
+            echo "::warning::Slack webhook responded: ${response}"
+          fi
