@@ -76,7 +76,7 @@ jobs:
         run: flutter test
 
       - name: Publish dry-run
-        run: flutter pub publish --dry-run --force
+        run: flutter pub publish --dry-run --ignore-warnings
 
       - name: Publish to pub.dev
         run: flutter pub publish --force
