@@ -53,6 +53,7 @@ example/.idea/
 
 # Example local credentials
 example/lib/local_config.dart
+.github/test-signing.env
 
 # macOS
 .DS_Store

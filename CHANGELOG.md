@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Fix Android release-build compatibility with the FreeRASP SDK dependency.
+
 ## 0.1.0
 
 - Android: upgrade to `vrtx-android` 0.1.1 with FreeRASP app-integrity support.

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'vrtx_flutter'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'Flutter wrapper for the Vrtx fintech SDK.'
   s.description      = 'Onboarding, wallet, and card flows via Vrtx — cross-platform Flutter plugin.'
   s.homepage         = 'https://github.com/vrtx-fintech/vrtx-flutter'

@@ -45,7 +45,14 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // CI installs app/release.keystore before its signed release build.
+            // The debug fallback keeps local release builds usable without
+            // committing signing material.
+            signingConfig = if (file("release.keystore").isFile) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

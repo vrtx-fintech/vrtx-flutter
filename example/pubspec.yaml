@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  vrtx_flutter: ^0.1.0
+  vrtx_flutter: ^0.1.1
 
 dev_dependencies:
   flutter_test:
