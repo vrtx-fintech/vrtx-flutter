@@ -49,7 +49,7 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
 
         let environment: Environment = {
             switch args["environment"] as? String {
-            case "staging": return .staging
+            case "production": return .production
             default:        return .sandbox
             }
         }()

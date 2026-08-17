@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.vrtx_flutter_example"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 37
     // Pinned to match what vrtx_flutter's transitive Android dependencies need
     // (AGP picks the highest requested NDK across plugins; Flutter's default
     // 27.x lags behind, which warns at assemble-time).
@@ -23,6 +23,13 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["vrtxPackageName"] = applicationId
+        // Set VRTX_CERT_HASH in ~/.gradle/gradle.properties or on the Gradle
+        // command line when testing the example with a signed build.
+        manifestPlaceholders["vrtxCertHash"] = providers
+            .gradleProperty("VRTX_CERT_HASH")
+            .orElse("")
+            .get()
     }
 
     buildTypes {

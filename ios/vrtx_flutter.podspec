@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'vrtx_flutter'
-  s.version          = '0.0.2'
+  s.version          = '0.1.0'
   s.summary          = 'Flutter wrapper for the Vrtx fintech SDK.'
   s.description      = 'Onboarding, wallet, and card flows via Vrtx — cross-platform Flutter plugin.'
   s.homepage         = 'https://github.com/vrtx-fintech/vrtx-flutter'
@@ -21,7 +21,10 @@ Pod::Spec.new do |s|
   # trunk (https://github.com/vrtx-fintech/vrtx-ios). CocoaPods downloads and
   # embeds it automatically, mirroring how Android pulls `vrtx-android` from
   # Maven Central. Keep this version aligned with the VRTX pod release.
-  s.dependency 'VRTX', '0.0.16'
+  s.dependency 'VRTX', '0.1.2'
+  # VRTX 0.1.2 imports DeviceKit from its public Swift interface. Declare it
+  # explicitly so CocoaPods links it for Flutter consumers.
+  s.dependency 'DeviceKit'
 
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',

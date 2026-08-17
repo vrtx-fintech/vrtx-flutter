@@ -1,15 +1,16 @@
 # Changelog
 
+## 0.1.0
+
+- Android: upgrade to `vrtx-android` 0.1.1 with FreeRASP app-integrity support.
+- iOS: upgrade to `VRTX` 0.1.2 and link its `DeviceKit` dependency.
+- Replace the `staging` environment with `production`.
+
 ## 0.0.2
 
 - iOS: pull the VRTX SDK from CocoaPods trunk via `s.dependency 'VRTX'`
-  instead of vendoring a downloaded `VRTX.xcframework`. `pod install` now
-  fetches the binary automatically — no out-of-band download step is needed.
-- No changes to the public Dart API.
+  instead of vendoring a downloaded `VRTX.xcframework`.
 
 ## 0.0.1
 
 - Initial release of the Vrtx Flutter SDK.
-- Public `Vrtx.setup(...)` entry point bridging the iOS and Android native SDKs.
-- `Environment`, `Language`, and `Mode` enums mirror the native SDK contracts.
-- `VrtxError` exception surfaces native `status` and `message` to Dart callers.

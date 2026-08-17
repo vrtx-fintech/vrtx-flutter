@@ -3,6 +3,7 @@
         android:label="vrtx-flutter"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
         android:theme="@style/NormalTheme">
         <activity
             android:name=".MainActivity"

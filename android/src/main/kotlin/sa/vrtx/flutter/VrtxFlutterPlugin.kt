@@ -81,7 +81,7 @@ class VrtxFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         val fontFamily   = call.argument<String?>("fontFamily")
 
         val environment: Environment = when (call.argument<String>("environment")) {
-            "staging" -> Environment.Staging
+            "production" -> Environment.Production
             else      -> Environment.Sandbox   // default to sandbox
         }
 
