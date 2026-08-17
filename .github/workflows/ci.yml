@@ -76,4 +76,6 @@ jobs:
           cache: true
       - run: flutter pub get
       # Sanity check that the package is publishable. Does not actually push.
-      - run: flutter pub publish --dry-run
+      # `--force` accepts non-fatal pub warnings (such as tool-generated
+      # analysis-options metadata) while retaining all publish validation.
+      - run: flutter pub publish --dry-run --force
