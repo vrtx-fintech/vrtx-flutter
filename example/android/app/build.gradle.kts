@@ -23,7 +23,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        manifestPlaceholders["vrtxPackageName"] = applicationId
+        manifestPlaceholders["vrtxPackageName"] = requireNotNull(applicationId) {
+            "applicationId is required for VRTX FreeRASP configuration"
+        }
         // Set VRTX_CERT_HASH in ~/.gradle/gradle.properties or on the Gradle
         // command line when testing the example with a signed build.
         manifestPlaceholders["vrtxCertHash"] = providers
