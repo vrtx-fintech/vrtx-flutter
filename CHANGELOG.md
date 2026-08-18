@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.2
+
+- **Breaking:** `Environment.staging` is replaced by `Environment.production`.
+  `staging` no longer exists in either native SDK; 0.1.0 and 0.1.1 kept the Dart
+  value but neither bridge accepted it, so `Environment.staging` silently ran
+  against sandbox and production was unreachable from Dart. Callers on
+  `Environment.staging` must move to `Environment.production` or
+  `Environment.sandbox` deliberately.
+- Both native bridges now reject an unrecognised environment with
+  `INVALID_ENVIRONMENT` instead of silently falling back to sandbox.
+- Pin the `DeviceKit` pod to `5.7.0`, matching the version the VRTX
+  xcframework is compiled against.
+
 ## 0.1.1
 
 - Fix Android release-build compatibility with the FreeRASP SDK dependency.
