@@ -80,9 +80,21 @@ class VrtxFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         val externalReference = call.argument<String?>("externalReference")
         val fontFamily   = call.argument<String?>("fontFamily")
 
-        val environment: Environment = when (call.argument<String>("environment")) {
+        // Reject unknown values rather than defaulting. A silent fallback here
+        // once let a `staging` caller run against Sandbox without any signal,
+        // which is the worst possible failure mode for an environment switch.
+        val environmentName = call.argument<String>("environment")
+        val environment: Environment = when (environmentName) {
+            "sandbox"    -> Environment.Sandbox
             "production" -> Environment.Production
-            else      -> Environment.Sandbox   // default to sandbox
+            else -> {
+                result.error(
+                    "INVALID_ENVIRONMENT",
+                    "Unsupported environment '\$environmentName'. Expected 'sandbox' or 'production'.",
+                    null,
+                )
+                return
+            }
         }
 
         val language: Language = when (call.argument<String>("language")) {

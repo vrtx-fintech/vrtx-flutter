@@ -47,12 +47,22 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
         let externalReference = args["externalReference"] as? String
         let fontFamily = args["fontFamily"] as? String  // nullable → nil uses SDK default
 
-        let environment: Environment = {
-            switch args["environment"] as? String {
-            case "production": return .production
-            default:        return .sandbox
-            }
-        }()
+        // Reject unknown values rather than defaulting. A silent fallback here
+        // once let a `staging` caller run against sandbox without any signal,
+        // which is the worst possible failure mode for an environment switch.
+        let environmentName = args["environment"] as? String
+        let environment: Environment
+        switch environmentName {
+        case "sandbox":    environment = .sandbox
+        case "production": environment = .production
+        default:
+            result(FlutterError(
+                code: "INVALID_ENVIRONMENT",
+                message: "Unsupported environment '\(environmentName ?? "nil")'. Expected 'sandbox' or 'production'.",
+                details: nil
+            ))
+            return
+        }
 
         let language: Language = {
             switch args["language"] as? String {
