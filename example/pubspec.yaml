@@ -10,7 +10,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  vrtx_flutter: ^0.1.1
+  vrtx_flutter: ^0.1.2
+
+# TEMPORARY — remove once vrtx_flutter 0.1.2 is published to pub.dev.
+# This PR adds `Environment.production` to the public Dart API and uses it in
+# the example, so the example cannot build against the published 0.1.1 (which
+# has no `production` value). CLAUDE.md's rule is that the committed constraint
+# is what CI builds against; that rule has no answer for a PR that introduces a
+# public API value and consumes it in the same change, so CI builds in-tree here
+# and the constraint above documents the version to pin after release.
+dependency_overrides:
+  vrtx_flutter:
+    path: ..
 
 dev_dependencies:
   flutter_test:
