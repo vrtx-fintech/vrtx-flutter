@@ -23,3 +23,14 @@ analyzer:
     # until populated. The example is still type-checked when it's actually
     # compiled by the platform build jobs.
     - "example/lib/local_config.dart"
+    # Flutter's AnalysisOptionsMigration (flutter_tools) appends any of
+    # build/android/ios/web/windows/macos/linux that `analyzer.exclude` does not
+    # already reach, on every `flutter pub get`. That left the tree dirty in CI
+    # and failed `pub publish --dry-run` on "checked-in files are modified in
+    # git". There is no opt-out, so the migrated state is committed here.
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
