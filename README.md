@@ -66,7 +66,7 @@ Then run `pod install` from your `ios/` directory.
 | `minSdk`              | 29      |
 | `compileSdk`          | 37      |
 | Android Gradle Plugin | 8.13    |
-| Kotlin                | 2.1     |
+| Kotlin                | 2.4     |
 | JVM target            | 17      |
 
 `vrtx-android` uses Talsec freeRASP to verify the host app's package name and
