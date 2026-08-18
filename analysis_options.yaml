@@ -1,6 +1,6 @@
 # Strict lint configuration based on Very Good Ventures' published ruleset.
 # https://pub.dev/packages/very_good_analysis
-include: package:very_good_analysis/analysis_options.10.2.0.yaml
+include: package:very_good_analysis/analysis_options.10.3.0.yaml
 
 analyzer:
   language:

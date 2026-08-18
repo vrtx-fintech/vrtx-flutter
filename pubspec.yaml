@@ -31,4 +31,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  very_good_analysis: ^10.0.0
+  # Pinned exactly, not ranged. very_good_analysis rewrites the `include:` line
+  # in analysis_options.yaml to the resolved version on every `pub get`, so a
+  # range leaves the tree dirty in CI as soon as a new version lands — which
+  # fails `pub publish --dry-run` on "checked-in files are modified".
+  # Bump this and the two `include:` lines together.
+  very_good_analysis: 10.3.0
