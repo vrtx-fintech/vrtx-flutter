@@ -54,26 +54,118 @@ jobs:
           IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
           IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
           IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
-          test -n "$IOS_CERTIFICATE_BASE64" || { echo "::error::IOS_CERTIFICATE_BASE64 is not configured"; exit 1; }
-          test -n "$IOS_CERTIFICATE_PASSWORD" || { echo "::error::IOS_CERTIFICATE_PASSWORD is not configured"; exit 1; }
-          test -n "$IOS_PROVISIONING_PROFILE_BASE64" || { echo "::error::IOS_PROVISIONING_PROFILE_BASE64 is not configured"; exit 1; }
-          CERTIFICATE_PATH="$RUNNER_TEMP/certificate.p12"
-          PROFILE_PATH="$RUNNER_TEMP/profile.mobileprovision"
-          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
-          echo "$IOS_CERTIFICATE_BASE64" | base64 --decode > "$CERTIFICATE_PATH"
-          echo "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$PROFILE_PATH"
-          security create-keychain -p "$IOS_CERTIFICATE_PASSWORD" "$KEYCHAIN_PATH"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-          security unlock-keychain -p "$IOS_CERTIFICATE_PASSWORD" "$KEYCHAIN_PATH"
-          security import "$CERTIFICATE_PATH" -P "$IOS_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
-          security list-keychain -d user -s "$KEYCHAIN_PATH"
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          PROFILE_UUID=$(security cms -D -i "$PROFILE_PATH" | plutil -extract UUID raw -)
-          cp "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/"$PROFILE_UUID".mobileprovision
+          set -euo pipefail
+          missing=()
+          [ -z "${IOS_CERTIFICATE_BASE64}" ] && missing+=(IOS_CERTIFICATE_BASE64)
+          [ -z "${IOS_CERTIFICATE_PASSWORD}" ] && missing+=(IOS_CERTIFICATE_PASSWORD)
+          [ -z "${IOS_PROVISIONING_PROFILE_BASE64}" ] && missing+=(IOS_PROVISIONING_PROFILE_BASE64)
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::Missing iOS signing secrets: ${missing[*]}"
+            exit 1
+          fi
+          # Fall back to the p12 password when no dedicated keychain password is
+          # configured, so the job stays runnable with the three core secrets.
+          KEYCHAIN_PASSWORD="${KEYCHAIN_PASSWORD:-${IOS_CERTIFICATE_PASSWORD}}"
+
+          CERTIFICATE_PATH="${RUNNER_TEMP}/certificate.p12"
+          PROFILE_PATH="${RUNNER_TEMP}/profile.mobileprovision"
+          KEYCHAIN_PATH="${RUNNER_TEMP}/app-signing.keychain-db"
+          # The decoded p12 is signing material; drop it as soon as it is in
+          # the keychain rather than leaving it on the runner's disk.
+          trap 'rm -f "${CERTIFICATE_PATH}"' EXIT
+
+          printf '%s' "${IOS_CERTIFICATE_BASE64}" | base64 --decode > "${CERTIFICATE_PATH}"
+          printf '%s' "${IOS_PROVISIONING_PROFILE_BASE64}" | base64 --decode > "${PROFILE_PATH}"
+
+          security create-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_PATH}"
+          security set-keychain-settings -lut 21600 "${KEYCHAIN_PATH}"
+          security unlock-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_PATH}"
+          security import "${CERTIFICATE_PATH}" -P "${IOS_CERTIFICATE_PASSWORD}" \
+            -A -t cert -f pkcs12 -k "${KEYCHAIN_PATH}"
+          # The `codesign:` partition is added explicitly so codesign can use the
+          # imported private key non-interactively, matching vrtx-sdk-ios.
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: -k "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_PATH}"
+          # `list-keychains` is plural — the singular form does not exist and
+          # silently left the temp keychain out of the search list before.
+          # Existing keychains are appended, not replaced, so the login keychain
+          # stays reachable. Word-splitting is intentional: each path must be a
+          # separate argument.
+          # shellcheck disable=SC2046
+          security list-keychains -d user -s "${KEYCHAIN_PATH}" $(security list-keychains -d user | tr -d '"')
+
+          mkdir -p "${HOME}/Library/MobileDevice/Provisioning Profiles"
+          PROFILE_PLIST="$(security cms -D -i "${PROFILE_PATH}")"
+          PROFILE_UUID="$(printf '%s' "${PROFILE_PLIST}" | plutil -extract UUID raw -)"
+          cp "${PROFILE_PATH}" "${HOME}/Library/MobileDevice/Provisioning Profiles/${PROFILE_UUID}.mobileprovision"
+
+          # Derive the team and profile name from the profile itself rather than
+          # carrying a separate IOS_TEAM_ID secret that can drift out of sync
+          # with the profile actually installed.
+          PROFILE_NAME="$(printf '%s' "${PROFILE_PLIST}" | plutil -extract Name raw -)"
+          TEAM_ID="$(printf '%s' "${PROFILE_PLIST}" | plutil -extract TeamIdentifier.0 raw -)"
+          # Export method must match the profile type, or -exportArchive fails
+          # with a confusing mismatch error: profiles that provision specific
+          # devices are ad-hoc/development, and those that don't are App Store.
+          if printf '%s' "${PROFILE_PLIST}" | plutil -extract ProvisionedDevices raw - >/dev/null 2>&1; then
+            EXPORT_METHOD="release-testing"   # ad-hoc
+          else
+            EXPORT_METHOD="app-store-connect"
+          fi
+
+          {
+            echo "TEAM_ID=${TEAM_ID}"
+            echo "PROFILE_NAME=${PROFILE_NAME}"
+            echo "EXPORT_METHOD=${EXPORT_METHOD}"
+          } >> "${GITHUB_ENV}"
+
+      - name: Configure Release signing for the example app
+        run: |
+          set -euo pipefail
+          # Flutter drives xcodebuild itself, so signing settings can't be passed
+          # on the command line — `flutter build ipa` forwards no build settings,
+          # and setting them globally would also apply to every Pods target
+          # (including VRTX.framework, which cannot take a provisioning profile).
+          # Release.xcconfig is the supported seam Flutter already reads.
+          cat >> ios/Flutter/Release.xcconfig <<EOF
+
+          // Injected by CI for the signed release build.
+          CODE_SIGN_STYLE = Manual
+          DEVELOPMENT_TEAM = ${TEAM_ID}
+          PROVISIONING_PROFILE_SPECIFIER = ${PROFILE_NAME}
+          CODE_SIGN_IDENTITY = Apple Distribution
+          EOF
+        working-directory: example
 
       - name: Build signed iOS release IPA
-        run: flutter build ipa --release
+        run: |
+          set -euo pipefail
+          cat > "${RUNNER_TEMP}/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>${EXPORT_METHOD}</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>sa.vrtx.vrtxFlutterExample</key><string>${PROFILE_NAME}</string>
+            </dict>
+          </dict>
+          </plist>
+          EOF
+          flutter build ipa --release --export-options-plist="${RUNNER_TEMP}/ExportOptions.plist"
         working-directory: example
-        env:
-          DEVELOPMENT_TEAM: ${{ secrets.IOS_TEAM_ID }}
+
+      # The point of this job is a device-installable build for FreeRASP checks,
+      # which needs the IPA to actually leave the runner.
+      - name: Upload signed IPA artifact
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: vrtx-flutter-example-signed-ipa
+          path: example/build/ios/ipa/*.ipa
+          if-no-files-found: error
+          retention-days: 14

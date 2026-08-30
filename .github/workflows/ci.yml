@@ -75,7 +75,9 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      - name: TEMP diagnostic - what does pub get modify?
+        run: |
+          git status --short
+          git diff -- analysis_options.yaml example/analysis_options.yaml | head -60
       # Sanity check that the package is publishable. Does not actually push.
-      # `--ignore-warnings` accepts non-fatal pub warnings (such as tool-generated
-      # analysis-options metadata) while retaining all publish validation.
-      - run: flutter pub publish --dry-run --ignore-warnings
+      - run: flutter pub publish --dry-run
