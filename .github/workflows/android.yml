@@ -53,8 +53,11 @@ jobs:
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > app/release.keystore
         working-directory: example/android
 
-      - name: Build signed Android release APK
-        run: flutter build apk --release
+      # Build per-ABI release APKs so each device gets only the native
+      # libraries for its architecture instead of one universal APK carrying
+      # arm64-v8a, armeabi-v7a, and x86_64 together.
+      - name: Build signed Android release APKs
+        run: flutter build apk --release --split-per-abi
         working-directory: example
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
