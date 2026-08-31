@@ -3,9 +3,11 @@ name: Release
 on:
   # Cut a release by pushing a tag whose name matches the pubspec.yaml
   # version, e.g. `git tag v0.0.1 && git push origin v0.0.1` when
-  # pubspec.yaml is at 0.0.1. pub.dev automated publishing only trusts the
-  # OIDC `push` and `workflow_dispatch` events — GitHub `release` events
-  # are NOT supported — so the tag push is what authorizes the publish.
+  # pubspec.yaml is at 0.0.1. auto-release.yml pushes this tag automatically
+  # whenever a version bump lands on main, so normally no one runs this by
+  # hand. pub.dev automated publishing only trusts tag-push-triggered runs —
+  # GitHub `release` events are NOT supported — so the tag push is what
+  # authorizes the publish.
   # See: https://dart.dev/tools/pub/automated-publishing
   push:
     tags:

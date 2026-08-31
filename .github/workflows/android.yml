@@ -13,6 +13,13 @@ jobs:
   build-example-app:
     runs-on: ubuntu-latest
 
+    env:
+      # Secrets are not readable in step `if:` conditions, so surface their
+      # presence through the env context. Without the keystore secret (e.g. a
+      # fork PR), the job degrades to a debug build instead of failing on
+      # missing repository configuration.
+      ANDROID_SIGNING_CONFIGURED: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -45,11 +52,18 @@ jobs:
         run: flutter pub get
         working-directory: example
 
+      - name: Build unsigned debug APK (signing secrets absent)
+        if: env.ANDROID_SIGNING_CONFIGURED != 'true'
+        run: |
+          echo "::notice::ANDROID_KEYSTORE_BASE64 is not configured; building a debug APK. Configure the Android signing secrets to get signed release APKs from this job."
+          flutter build apk --debug
+        working-directory: example
+
       - name: Configure Android release signing
+        if: env.ANDROID_SIGNING_CONFIGURED == 'true'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          test -n "$ANDROID_KEYSTORE_BASE64" || { echo "::error::ANDROID_KEYSTORE_BASE64 is not configured"; exit 1; }
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > app/release.keystore
         working-directory: example/android
 
@@ -57,6 +71,7 @@ jobs:
       # libraries for its architecture instead of one universal APK carrying
       # arm64-v8a, armeabi-v7a, and x86_64 together.
       - name: Build signed Android release APKs
+        if: env.ANDROID_SIGNING_CONFIGURED == 'true'
         run: flutter build apk --release --split-per-abi
         working-directory: example
         env:
@@ -69,6 +84,7 @@ jobs:
       # on devices for app-integrity verification, so it has to leave the
       # runner.
       - name: Upload signed APK artifacts
+        if: env.ANDROID_SIGNING_CONFIGURED == 'true'
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: vrtx-flutter-example-signed-apks

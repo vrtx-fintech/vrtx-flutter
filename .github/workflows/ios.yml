@@ -14,6 +14,16 @@ jobs:
     name: build-example-ios
     runs-on: macos-latest
 
+    env:
+      # Secrets are not readable in step `if:` conditions, so surface their
+      # presence through the env context. While the signing secrets are not
+      # configured, the job degrades to an unsigned simulator build instead of
+      # failing every PR on missing repository configuration.
+      IOS_SIGNING_CONFIGURED: >-
+        ${{ secrets.IOS_CERTIFICATE_BASE64 != ''
+         && secrets.IOS_CERTIFICATE_PASSWORD != ''
+         && secrets.IOS_PROVISIONING_PROFILE_BASE64 != '' }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -49,7 +59,15 @@ jobs:
         run: flutter pub get
         working-directory: example
 
+      - name: Build unsigned iOS app for simulator (signing secrets absent)
+        if: env.IOS_SIGNING_CONFIGURED != 'true'
+        run: |
+          echo "::notice::iOS signing secrets are not configured; building for the simulator without codesigning. Configure IOS_CERTIFICATE_BASE64, IOS_CERTIFICATE_PASSWORD and IOS_PROVISIONING_PROFILE_BASE64 to get a signed release IPA from this job."
+          flutter build ios --release --simulator --no-codesign
+        working-directory: example
+
       - name: Install iOS signing certificate and provisioning profile
+        if: env.IOS_SIGNING_CONFIGURED == 'true'
         env:
           IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
           IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
@@ -57,14 +75,6 @@ jobs:
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
           set -euo pipefail
-          missing=()
-          [ -z "${IOS_CERTIFICATE_BASE64}" ] && missing+=(IOS_CERTIFICATE_BASE64)
-          [ -z "${IOS_CERTIFICATE_PASSWORD}" ] && missing+=(IOS_CERTIFICATE_PASSWORD)
-          [ -z "${IOS_PROVISIONING_PROFILE_BASE64}" ] && missing+=(IOS_PROVISIONING_PROFILE_BASE64)
-          if [ "${#missing[@]}" -gt 0 ]; then
-            echo "::error::Missing iOS signing secrets: ${missing[*]}"
-            exit 1
-          fi
           # Fall back to the p12 password when no dedicated keychain password is
           # configured, so the job stays runnable with the three core secrets.
           KEYCHAIN_PASSWORD="${KEYCHAIN_PASSWORD:-${IOS_CERTIFICATE_PASSWORD}}"
@@ -122,6 +132,7 @@ jobs:
           } >> "${GITHUB_ENV}"
 
       - name: Configure Release signing for the example app
+        if: env.IOS_SIGNING_CONFIGURED == 'true'
         run: |
           set -euo pipefail
           # Flutter drives xcodebuild itself, so signing settings can't be passed
@@ -140,6 +151,7 @@ jobs:
         working-directory: example
 
       - name: Build signed iOS release IPA
+        if: env.IOS_SIGNING_CONFIGURED == 'true'
         run: |
           set -euo pipefail
           cat > "${RUNNER_TEMP}/ExportOptions.plist" <<EOF
@@ -163,6 +175,7 @@ jobs:
       # The point of this job is a device-installable build for FreeRASP checks,
       # which needs the IPA to actually leave the runner.
       - name: Upload signed IPA artifact
+        if: env.IOS_SIGNING_CONFIGURED == 'true'
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: vrtx-flutter-example-signed-ipa
