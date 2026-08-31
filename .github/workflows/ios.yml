@@ -63,7 +63,7 @@ jobs:
         if: env.IOS_SIGNING_CONFIGURED != 'true'
         run: |
           echo "::notice::iOS signing secrets are not configured; building for the simulator without codesigning. Configure IOS_CERTIFICATE_BASE64, IOS_CERTIFICATE_PASSWORD and IOS_PROVISIONING_PROFILE_BASE64 to get a signed release IPA from this job."
-          flutter build ios --release --simulator --no-codesign
+          flutter build ios --debug --simulator --no-codesign
         working-directory: example
 
       - name: Install iOS signing certificate and provisioning profile
