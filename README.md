@@ -64,21 +64,48 @@ Then run `pod install` from your `ios/` directory.
 | Requirement           | Version |
 | --------------------- | ------- |
 | `minSdk`              | 29      |
-| `compileSdk`          | 36      |
+| `compileSdk`          | 37      |
 | Android Gradle Plugin | 8.13    |
-| Kotlin                | 2.1     |
+| Kotlin                | 2.4     |
 | JVM target            | 17      |
 
-Make sure your Android project can resolve Google and Maven Central artifacts:
+`vrtx-android` uses Talsec freeRASP to verify the host app's package name and
+signing certificate. Configure the required repositories in
+`android/settings.gradle.kts`:
 
 ```kotlin
 dependencyResolutionManagement {
     repositories {
         google()
+        maven(url = "https://europe-west3-maven.pkg.dev/talsec-artifact-repository/freerasp")
+        maven(url = "https://jitpack.io")
         mavenCentral()
     }
 }
 ```
+
+Then configure the placeholders in `android/app/build.gradle.kts`:
+
+```kotlin
+android {
+    defaultConfig {
+        manifestPlaceholders["vrtxPackageName"] = applicationId
+        manifestPlaceholders["vrtxCertHash"] = "YOUR_BASE64_SHA256_CERTIFICATE_HASH"
+    }
+}
+```
+
+Generate the certificate hash from the certificate that signs the installed
+app. Debug and release hashes may be comma-separated:
+
+```bash
+keytool -list -v -keystore path/to/your/keystore.jks -alias your_alias
+echo -n "SHA256_HEX_WITHOUT_COLONS" | xxd -r -p | base64
+```
+
+FreeRASP disables Android backups; set `android:allowBackup="false"` on the
+host app's `<application>` element to avoid a manifest-merger conflict. Run a
+full native rebuild after changing the hash.
 
 ## Contract
 
@@ -86,7 +113,7 @@ The Flutter API mirrors the native SDK public enums:
 
 | Parameter     | Enum          | Values                                       |
 | ------------- | ------------- | -------------------------------------------- |
-| `environment` | `Environment` | `Environment.sandbox`, `Environment.staging` |
+| `environment` | `Environment` | `Environment.sandbox`, `Environment.production` |
 | `language`    | `Language`    | `Language.english`, `Language.arabic`        |
 | `mode`        | `Mode`        | `Mode.light`, `Mode.dark`                    |
 

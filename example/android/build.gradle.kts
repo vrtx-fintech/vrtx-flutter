@@ -1,6 +1,8 @@
 allprojects {
     repositories {
         google()
+        maven(url = "https://europe-west3-maven.pkg.dev/talsec-artifact-repository/freerasp")
+        maven(url = "https://jitpack.io")
         mavenCentral()
     }
 }

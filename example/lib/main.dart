@@ -56,8 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Language get _language => _isEnglish ? Language.english : Language.arabic;
 
-  Environment get _environment =>
-      vrtxEnvironment == 'staging' ? Environment.staging : Environment.sandbox;
+  Environment get _environment => vrtxEnvironment == 'production'
+      ? Environment.production
+      : Environment.sandbox;
 
   String get _fontFamily =>
       _isEnglish ? _selectedEnglishFont.family : _selectedArabicFont.family;

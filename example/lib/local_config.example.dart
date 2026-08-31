@@ -9,5 +9,5 @@ const vrtxClientId = 'YOUR_CLIENT_ID';
 /// Vrtx client secret issued by your Vrtx account manager.
 const vrtxClientSecret = 'YOUR_CLIENT_SECRET';
 
-/// Target Vrtx environment, e.g. `sandbox` or `staging`.
+/// Target Vrtx environment: `sandbox` or `production`.
 const vrtxEnvironment = 'sandbox';
