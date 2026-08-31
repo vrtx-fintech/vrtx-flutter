@@ -10,7 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  vrtx_flutter: ^0.1.3
+  # Always build the example against the plugin source in this repo (the
+  # standard Flutter plugin-template layout). A registry constraint here made
+  # CI compile the *published* package, so example builds never exercised the
+  # code under review.
+  vrtx_flutter:
+    path: ../
 
 dev_dependencies:
   flutter_test:

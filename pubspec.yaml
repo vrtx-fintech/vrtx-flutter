@@ -9,7 +9,7 @@ topics:
   - wallet
   - onboarding
 
-version: 0.1.3
+version: 0.1.4
 
 environment:
   sdk: ">=3.12.0 <4.0.0"

@@ -47,9 +47,9 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
         let externalReference = args["externalReference"] as? String
         let fontFamily = args["fontFamily"] as? String  // nullable → nil uses SDK default
 
-        // Reject unknown values rather than defaulting. A silent fallback here
-        // once let a `staging` caller run against sandbox without any signal,
-        // which is the worst possible failure mode for an environment switch.
+        // Reject unknown values rather than defaulting: a silent fallback can
+        // point an integrator at the wrong backend without any signal, the
+        // worst possible failure mode for an environment switch.
         let environmentName = args["environment"] as? String
         let environment: Environment
         switch environmentName {

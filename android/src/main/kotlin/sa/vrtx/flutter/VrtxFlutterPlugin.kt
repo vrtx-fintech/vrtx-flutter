@@ -80,9 +80,9 @@ class VrtxFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         val externalReference = call.argument<String?>("externalReference")
         val fontFamily   = call.argument<String?>("fontFamily")
 
-        // Reject unknown values rather than defaulting. A silent fallback here
-        // once let a `staging` caller run against Sandbox without any signal,
-        // which is the worst possible failure mode for an environment switch.
+        // Reject unknown values rather than defaulting: a silent fallback can
+        // point an integrator at the wrong backend without any signal, the
+        // worst possible failure mode for an environment switch.
         val environmentName = call.argument<String>("environment")
         val environment: Environment = when (environmentName) {
             "sandbox"    -> Environment.Sandbox
@@ -90,7 +90,7 @@ class VrtxFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             else -> {
                 result.error(
                     "INVALID_ENVIRONMENT",
-                    "Unsupported environment '\$environmentName'. Expected 'sandbox' or 'production'.",
+                    "Unsupported environment '$environmentName'. Expected 'sandbox' or 'production'.",
                     null,
                 )
                 return

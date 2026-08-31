@@ -64,3 +64,14 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           ORG_GRADLE_PROJECT_VRTX_CERT_HASH: ${{ secrets.VRTX_CERT_HASH }}
+
+      # Like the iOS job's IPA: the signed build exists so it can be installed
+      # on devices for app-integrity verification, so it has to leave the
+      # runner.
+      - name: Upload signed APK artifacts
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: vrtx-flutter-example-signed-apks
+          path: example/build/app/outputs/flutter-apk/*-release.apk
+          if-no-files-found: error
+          retention-days: 14

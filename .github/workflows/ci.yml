@@ -75,9 +75,5 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - name: TEMP diagnostic - what does pub get modify?
-        run: |
-          git status --short
-          git diff -- analysis_options.yaml example/analysis_options.yaml | head -60
       # Sanity check that the package is publishable. Does not actually push.
       - run: flutter pub publish --dry-run

@@ -5,22 +5,14 @@ import 'package:vrtx_flutter/vrtx_flutter.dart';
 /// as a string by both native bridges (`VrtxFlutterPlugin.kt` and
 /// `VrtxFlutterPlugin.swift`). Nothing in the type system ties the two
 /// together, so a rename on either side compiles cleanly and fails only at
-/// runtime — which is exactly how 0.1.0 and 0.1.1 shipped with `staging` on
-/// the Dart side and `production` on both native sides, silently routing
-/// every caller to sandbox. This test is that missing link.
+/// runtime, silently routing callers to the wrong backend. These tests pin
+/// the Dart side of that contract.
 void main() {
   group('Environment channel contract', () {
     test('exposes exactly the values both native bridges accept', () {
       expect(
         Environment.values.map((e) => e.name).toSet(),
         {'sandbox', 'production'},
-      );
-    });
-
-    test('does not expose staging, which no native SDK accepts', () {
-      expect(
-        Environment.values.map((e) => e.name),
-        isNot(contains('staging')),
       );
     });
   });
