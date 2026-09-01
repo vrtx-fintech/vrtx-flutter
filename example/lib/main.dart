@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:vrtx_flutter/vrtx_flutter.dart';
 import 'package:vrtx_flutter_example/local_config.dart';
@@ -31,8 +29,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static final Random _random = Random.secure();
-
   bool _isEnglish = true;
 
   static const List<_FontOption> _englishFonts = [
@@ -53,6 +49,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _FontOption _selectedEnglishFont = _englishFonts.first;
   _FontOption _selectedArabicFont = _arabicFonts.first;
+  final _externalReferenceController = TextEditingController();
+
+  @override
+  void dispose() {
+    _externalReferenceController.dispose();
+    super.dispose();
+  }
 
   Language get _language => _isEnglish ? Language.english : Language.arabic;
 
@@ -60,8 +63,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ? Environment.production
       : Environment.sandbox;
 
-  String get _fontFamily =>
-      _isEnglish ? _selectedEnglishFont.family : _selectedArabicFont.family;
+  _FontOption get _selectedFont =>
+      _isEnglish ? _selectedEnglishFont : _selectedArabicFont;
+
+  List<_FontOption> get _fontOptions =>
+      _isEnglish ? _englishFonts : _arabicFonts;
+
+  String get _fontFamily => _selectedFont.family;
 
   String get _title =>
       _isEnglish ? 'Welcome to\nvrtx Pay' : 'مرحباً بك في\nڤرتكس باي';
@@ -72,11 +80,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String get _languageLabel => _isEnglish ? 'Language' : 'اللغة';
 
-  String get _englishFontLabel =>
-      _isEnglish ? 'English Font' : 'خط اللغة الإنجليزية';
+  String get _fontLabel => _isEnglish ? 'English Font' : 'الخط العربي';
 
-  String get _arabicFontLabel =>
-      _isEnglish ? 'Arabic Font' : 'خط اللغة العربية';
+  String get _externalReferenceLabel =>
+      _isEnglish ? 'External Reference' : 'المرجع الخارجي';
+
+  String get _externalReferenceHint => _isEnglish ? 'Optional' : 'اختياري';
+
+  String get _environmentLabel => vrtxEnvironment.toUpperCase();
+
+  String get _configurationLabel =>
+      _isEnglish ? 'SDK Configuration' : 'إعدادات SDK';
+
+  String get _configurationHint =>
+      _isEnglish ? 'Customize your session' : 'خصص جلستك';
+
+  String get _footerLabel => _isEnglish
+      ? 'Sandbox environment • Secure SDK demo'
+      : 'بيئة تجريبية • عرض آمن لـ SDK';
 
   String get _buttonLabel => _isEnglish ? 'Get Started' : 'ابدأ الآن';
 
@@ -88,7 +109,9 @@ class _HomeScreenState extends State<HomeScreen> {
         environment: _environment,
         language: _language,
         mode: Mode.light,
-        externalReference: _generateUuid(),
+        externalReference: _externalReferenceController.text.trim().isEmpty
+            ? null
+            : _externalReferenceController.text.trim(),
         fontFamily: _fontFamily,
       );
 
@@ -97,26 +120,11 @@ class _HomeScreenState extends State<HomeScreen> {
       debugPrint('Vrtx error [${e.status}]: ${e.message}');
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('[${e.status}] ${e.message}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('[${e.status}] ${e.message}')));
       }
     }
-  }
-
-  static String _generateUuid() {
-    final bytes = List<int>.generate(16, (_) => _random.nextInt(256));
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-
-    final hex = bytes
-        .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
-        .join();
-    return '${hex.substring(0, 8)}-'
-        '${hex.substring(8, 12)}-'
-        '${hex.substring(12, 16)}-'
-        '${hex.substring(16, 20)}-'
-        '${hex.substring(20)}';
   }
 
   @override
@@ -124,53 +132,141 @@ class _HomeScreenState extends State<HomeScreen> {
     return Directionality(
       textDirection: _isEnglish ? TextDirection.ltr : TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF7F8FA),
         body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      padding: const EdgeInsets.all(11),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x12000000),
+                            blurRadius: 18,
+                            offset: Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Image.asset('assets/icon.png'),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEAF5EF),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF3C9B66),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 7),
+                          Text(
+                            _environmentLabel,
+                            style: TextStyle(
+                              color: const Color(0xFF287348),
+                              fontFamily: _fontFamily,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 34),
+                Text(
+                  _title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFF111111),
+                    fontFamily: _fontFamily,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w800,
+                    height: 1.08,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _subtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFF7B8087),
+                    fontFamily: _fontFamily,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: const Color(0xFFE9EBEF)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x0A000000),
+                        blurRadius: 24,
+                        offset: Offset(0, 10),
+                      ),
+                    ],
+                  ),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 12),
-                      Container(
-                        width: 106,
-                        height: 106,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF0F0F4),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(22),
-                          child: Image.asset('assets/icon.png'),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _configurationLabel,
+                            style: TextStyle(
+                              color: const Color(0xFF111111),
+                              fontFamily: _fontFamily,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          Text(
+                            _configurationHint,
+                            style: TextStyle(
+                              color: const Color(0xFF9CA1A8),
+                              fontFamily: _fontFamily,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 20),
-                      Text(
-                        _title,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: _fontFamily,
-                          fontSize: 21,
-                          fontWeight: FontWeight.w800,
-                          height: 1.08,
-                        ),
+                      const SizedBox(height: 22),
+                      _ExternalReferenceRow(
+                        label: _externalReferenceLabel,
+                        hint: _externalReferenceHint,
+                        controller: _externalReferenceController,
+                        fontFamily: _fontFamily,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _subtitle,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: const Color(0xFF8B8B8B),
-                          fontFamily: _fontFamily,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      const Spacer(),
-                      const Divider(height: 1, color: Color(0xFFE6E6E6)),
+                      const SizedBox(height: 18),
                       _LanguageRow(
                         label: _languageLabel,
                         isEnglish: _isEnglish,
@@ -179,55 +275,159 @@ class _HomeScreenState extends State<HomeScreen> {
                           setState(() => _isEnglish = value);
                         },
                       ),
+                      const SizedBox(height: 18),
                       _FontDropdownRow(
-                        label: _englishFontLabel,
-                        value: _selectedEnglishFont,
-                        options: _englishFonts,
+                        label: _fontLabel,
+                        value: _selectedFont,
+                        options: _fontOptions,
                         labelFontFamily: _fontFamily,
                         onChanged: (value) {
                           if (value == null) return;
-                          setState(() => _selectedEnglishFont = value);
-                        },
-                      ),
-                      _FontDropdownRow(
-                        label: _arabicFontLabel,
-                        value: _selectedArabicFont,
-                        options: _arabicFonts,
-                        labelFontFamily: _fontFamily,
-                        onChanged: (value) {
-                          if (value == null) return;
-                          setState(() => _selectedArabicFont = value);
+                          setState(() {
+                            if (_isEnglish) {
+                              _selectedEnglishFont = value;
+                            } else {
+                              _selectedArabicFont = value;
+                            }
+                          });
                         },
                       ),
                     ],
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 16, 10, 49),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: FilledButton(
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 56,
+                  child: FilledButton.icon(
                     onPressed: _launchVrtx,
+                    icon: Icon(
+                      _isEnglish
+                          ? Icons.arrow_forward_rounded
+                          : Icons.arrow_back_rounded,
+                      size: 19,
+                    ),
+                    label: Text(_buttonLabel),
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: const Color(0xFF111111),
                       foregroundColor: Colors.white,
-                      shape: const StadiumBorder(),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(17),
+                      ),
+                      elevation: 0,
                       textStyle: TextStyle(
                         fontFamily: _fontFamily,
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    child: Text(_buttonLabel),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Text(
+                  _footerLabel,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFF9CA1A8),
+                    fontFamily: _fontFamily,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ControlLabel extends StatelessWidget {
+  const _ControlLabel({required this.label, required this.fontFamily});
+
+  final String label;
+  final String fontFamily;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      style: TextStyle(
+        color: const Color(0xFF34383E),
+        fontFamily: fontFamily,
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+  }
+}
+
+class _ExternalReferenceRow extends StatelessWidget {
+  const _ExternalReferenceRow({
+    required this.label,
+    required this.hint,
+    required this.controller,
+    required this.fontFamily,
+  });
+
+  final String label;
+  final String hint;
+  final TextEditingController controller;
+  final String fontFamily;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _ControlLabel(label: label, fontFamily: fontFamily),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          textDirection: TextDirection.ltr,
+          style: TextStyle(
+            color: const Color(0xFF17191C),
+            fontFamily: fontFamily,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(
+              color: const Color(0xFFA6ABB2),
+              fontFamily: fontFamily,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+            prefixIcon: const Icon(
+              Icons.tag_rounded,
+              size: 19,
+              color: Color(0xFF8B929A),
+            ),
+            filled: true,
+            fillColor: const Color(0xFFF7F8FA),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(color: Color(0xFFE6E9ED)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(color: Color(0xFFE6E9ED)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: Color(0xFF17191C),
+                width: 1.4,
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 15,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -247,53 +447,86 @@ class _LanguageRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 52,
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Colors.black,
-                fontFamily: fontFamily,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _ControlLabel(label: label, fontFamily: fontFamily),
+        const SizedBox(height: 8),
+        Container(
+          height: 50,
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF1F3F5),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: _LanguageChoice(
+                  label: 'English',
+                  selected: isEnglish,
+                  fontFamily: fontFamily,
+                  onTap: () => onChanged(true),
+                ),
               ),
-            ),
+              Expanded(
+                child: _LanguageChoice(
+                  label: 'العربية',
+                  selected: !isEnglish,
+                  fontFamily: fontFamily,
+                  onTap: () => onChanged(false),
+                ),
+              ),
+            ],
           ),
-          Text(
-            'EN',
-            style: TextStyle(
-              color: isEnglish ? Colors.black : const Color(0xFFC7C7C7),
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-            ),
+        ),
+      ],
+    );
+  }
+}
+
+class _LanguageChoice extends StatelessWidget {
+  const _LanguageChoice({
+    required this.label,
+    required this.selected,
+    required this.fontFamily,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final String fontFamily;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(11),
+          boxShadow: selected
+              ? const [
+                  BoxShadow(
+                    color: Color(0x12000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? const Color(0xFF17191C) : const Color(0xFF8B929A),
+            fontFamily: fontFamily,
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
           ),
-          const SizedBox(width: 6),
-          SizedBox(
-            width: 46,
-            height: 28,
-            child: Switch(
-              value: !isEnglish,
-              onChanged: (value) => onChanged(!value),
-              activeThumbColor: Colors.white,
-              activeTrackColor: const Color(0xFFDDDDDD),
-              inactiveThumbColor: Colors.white,
-              inactiveTrackColor: const Color(0xFFDDDDDD),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            'AR',
-            style: TextStyle(
-              color: isEnglish ? const Color(0xFFC7C7C7) : Colors.black,
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -324,76 +557,65 @@ class _FontDropdownRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Divider(height: 1, color: Color(0xFFE6E6E6)),
-        SizedBox(
-          height: 52,
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontFamily: labelFontFamily,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+        _ControlLabel(label: label, fontFamily: labelFontFamily),
+        const SizedBox(height: 8),
+        Container(
+          height: 50,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF7F8FA),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFFE6E9ED)),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<_FontOption>(
+              value: value,
+              isExpanded: true,
+              isDense: true,
+              icon: const Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 21,
+                color: Color(0xFF59616A),
               ),
-              SizedBox(
-                width: 196,
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<_FontOption>(
-                    value: value,
-                    isExpanded: true,
-                    isDense: true,
-                    icon: const Icon(
-                      Icons.unfold_more,
-                      size: 19,
-                      color: Colors.black,
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              alignment: AlignmentDirectional.centerStart,
+              selectedItemBuilder: (context) {
+                return options.map((option) {
+                  return Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      option.label,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: const Color(0xFF17191C),
+                        fontFamily: option.family,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    dropdownColor: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    alignment: AlignmentDirectional.centerEnd,
-                    selectedItemBuilder: (context) {
-                      return options.map((option) {
-                        return Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            option.label,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontFamily: option.family,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        );
-                      }).toList();
-                    },
-                    items: options.map((option) {
-                      return DropdownMenuItem<_FontOption>(
-                        value: option,
-                        child: Text(
-                          option.label,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: option.family,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: onChanged,
+                  );
+                }).toList();
+              },
+              items: options.map((option) {
+                return DropdownMenuItem<_FontOption>(
+                  value: option,
+                  child: Text(
+                    option.label,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: const Color(0xFF17191C),
+                      fontFamily: option.family,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-              ),
-            ],
+                );
+              }).toList(),
+              onChanged: onChanged,
+            ),
           ),
         ),
       ],

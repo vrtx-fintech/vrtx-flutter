@@ -4,6 +4,14 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+fun localVrtxCertificateHash(): String {
+    val configFile = rootProject.file("../lib/local_config.dart")
+    if (!configFile.isFile) return ""
+
+    val hashPattern = Regex("""const\s+vrtxCertHash\s*=\s*['\"]([^'\"]+)['\"]""")
+    return hashPattern.find(configFile.readText())?.groupValues?.get(1).orEmpty()
+}
+
 android {
     namespace = "com.example.vrtx_flutter_example"
     compileSdk = 37
@@ -26,11 +34,11 @@ android {
         manifestPlaceholders["vrtxPackageName"] = requireNotNull(applicationId) {
             "applicationId is required for VRTX FreeRASP configuration"
         }
-        // Set VRTX_CERT_HASH in ~/.gradle/gradle.properties or on the Gradle
-        // command line when testing the example with a signed build.
+        // A Gradle property takes precedence; local_config.dart provides the
+        // default for local debug builds.
         manifestPlaceholders["vrtxCertHash"] = providers
             .gradleProperty("VRTX_CERT_HASH")
-            .orElse("")
+            .orElse(localVrtxCertificateHash())
             .get()
     }
 
