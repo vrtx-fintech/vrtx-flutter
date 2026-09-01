@@ -581,7 +581,6 @@ class _FontDropdownRow extends StatelessWidget {
               ),
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(14),
-              alignment: AlignmentDirectional.centerStart,
               selectedItemBuilder: (context) {
                 return options.map((option) {
                   return Align(
