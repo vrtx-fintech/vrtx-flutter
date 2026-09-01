@@ -13,8 +13,8 @@ enum Environment {
   /// Sandbox environment for local development and integration testing.
   sandbox,
 
-  /// Staging environment for pre-production validation.
-  staging,
+  /// Production environment serving live customers.
+  production,
 }
 
 /// SDK display language.
@@ -73,7 +73,7 @@ class Vrtx {
   /// Parameters:
   /// - [clientId]     Your Vrtx client ID.
   /// - [clientSecret] Your Vrtx client secret.
-  /// - [environment]  [Environment.sandbox] or [Environment.staging].
+  /// - [environment]  [Environment.sandbox] or [Environment.production].
   /// - [language]     [Language.english] or [Language.arabic].
   /// - [mode]         [Mode.light] or [Mode.dark].
   /// - [externalReference] Optional app-provided SDK session reference.

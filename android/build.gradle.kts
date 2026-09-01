@@ -1,15 +1,12 @@
 import com.android.build.api.dsl.LibraryExtension
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
 }
 
 extensions.configure<LibraryExtension>("android") {
     namespace = "sa.vrtx.flutter"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 29
@@ -21,14 +18,23 @@ extensions.configure<LibraryExtension>("android") {
     }
 }
 
-extensions.configure<KotlinAndroidProjectExtension>("kotlin") {
+kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_17
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
+// Keep the Kotlin runtime compatible with Flutter's AGP 9 fallback compiler
+// while the example app uses android.builtInKotlin=false.
+configurations.configureEach {
+    resolutionStrategy {
+        force("org.jetbrains.kotlin:kotlin-stdlib:2.2.20")
+        force("org.jetbrains.kotlin:kotlin-reflect:2.2.20")
     }
 }
 
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2026.05.01"))
     implementation("androidx.compose.ui:ui")
-    implementation("sa.vrtx.sa:vrtx-android:0.1.0")
+    implementation("sa.vrtx.sa:vrtx-android:0.1.7")
 }
