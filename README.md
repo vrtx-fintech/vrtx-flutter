@@ -131,7 +131,7 @@ The Flutter API mirrors the native SDK public enums:
 
 ## Support
 
-For credentials, license keys, and integration help, contact your Vrtx account manager or [support@vrtx.sa](mailto:support@vrtx.sa).
+For credentials, license keys, and integration help, contact your Vrtx account manager or [contact@vrtx.sa](mailto:contact@vrtx.sa).
 
 ## License
 
