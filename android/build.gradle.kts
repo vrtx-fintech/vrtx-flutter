@@ -1,10 +1,7 @@
 import com.android.build.api.dsl.LibraryExtension
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
 }
 
 extensions.configure<LibraryExtension>("android") {
@@ -21,21 +18,18 @@ extensions.configure<LibraryExtension>("android") {
     }
 }
 
-extensions.configure<KotlinAndroidProjectExtension>("kotlin") {
+kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_17
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 
-// vrtx-android ships Kotlin stdlib/reflect built against an older Kotlin than
-// the example app's Kotlin Gradle Plugin (2.4.10, pinned in
-// example/android/settings.gradle.kts). Force both onto the host KGP's version
-// so Android Lint does not load mixed Kotlin compiler/runtime internals.
-// Keep this in step with that plugin version when it moves.
+// Keep the Kotlin runtime compatible with Flutter's AGP 9 fallback compiler
+// while the example app uses android.builtInKotlin=false.
 configurations.configureEach {
     resolutionStrategy {
-        force("org.jetbrains.kotlin:kotlin-stdlib:2.4.10")
-        force("org.jetbrains.kotlin:kotlin-reflect:2.4.10")
+        force("org.jetbrains.kotlin:kotlin-stdlib:2.2.20")
+        force("org.jetbrains.kotlin:kotlin-reflect:2.2.20")
     }
 }
 
