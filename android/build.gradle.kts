@@ -28,8 +28,8 @@ kotlin {
 // while the example app uses android.builtInKotlin=false.
 configurations.configureEach {
     resolutionStrategy {
-        force("org.jetbrains.kotlin:kotlin-stdlib:2.2.20")
-        force("org.jetbrains.kotlin:kotlin-reflect:2.2.20")
+        force("org.jetbrains.kotlin:kotlin-stdlib:2.4.10")
+        force("org.jetbrains.kotlin:kotlin-reflect:2.4.10")
     }
 }
 
