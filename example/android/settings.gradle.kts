@@ -19,7 +19,7 @@ pluginManagement {
 
 plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
-    id("com.android.application") version "9.4.0" apply false
+    id("com.android.application") version "9.4.1" apply false
     // Flutter 3.44's compatibility fallback applies KGP to migrated plugin
     // modules while built-in Kotlin remains disabled.
     id("org.jetbrains.kotlin.android") version "2.4.20" apply false
