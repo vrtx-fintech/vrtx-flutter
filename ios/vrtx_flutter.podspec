@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
   # `DeviceKit (= 5.7.0)` as its own dependency, so CocoaPods resolves and
   # links it transitively. A second exact pin here would only add a hard
   # conflict the day VRTX moves its pin.
-  s.dependency 'VRTX', '0.1.11'
+  s.dependency 'VRTX', '0.1.15'
 
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',

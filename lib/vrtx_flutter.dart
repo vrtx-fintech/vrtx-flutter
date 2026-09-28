@@ -1,3 +1,5 @@
+// Theme value objects are documented together in the README contract.
+// ignore_for_file: public_member_api_docs
 /// Flutter SDK for Vrtx — onboarding, wallet, and card flows.
 ///
 /// Public surface mirrors the native iOS and Android SDKs. Call
@@ -35,6 +37,357 @@ enum Mode {
   dark,
 }
 
+/// Selects the SDK's product design variant.
+enum DesignOption {
+  /// Design variant A.
+  optionA,
+
+  /// Design variant B.
+  optionB,
+
+  /// Design variant C.
+  optionC,
+}
+
+/// Optional colors for [VrtxThemeOptions]. Values are CSS-style color strings
+/// such as `#377DFF` or `rgba(55, 125, 255, 1)`.
+class VrtxColors {
+  const VrtxColors({
+    this.allBrands,
+    this.labels,
+    this.fills,
+    this.backgrounds,
+    this.backgroundsGradient,
+    this.accents,
+  });
+
+  final VrtxAllBrandColors? allBrands;
+  final VrtxLabelColors? labels;
+  final VrtxFillColors? fills;
+  final VrtxBackgroundColors? backgrounds;
+  final VrtxBackgroundGradientColors? backgroundsGradient;
+  final VrtxAccentColors? accents;
+
+  Map<String, Object?> toMap() => _nonNullMap({
+    'allBrands': allBrands?.toMap(),
+    'labels': labels?.toMap(),
+    'fills': fills?.toMap(),
+    'backgrounds': backgrounds?.toMap(),
+    'backgroundsGradient': backgroundsGradient?.toMap(),
+    'accents': accents?.toMap(),
+  });
+}
+
+/// Brand colors used by the SDK.
+class VrtxAllBrandColors {
+  const VrtxAllBrandColors({this.primary, this.buttonLabel});
+
+  final String? primary;
+  final String? buttonLabel;
+
+  Map<String, Object?> toMap() => _nonNullMap({
+    'primary': primary,
+    'buttonLabel': buttonLabel,
+  });
+}
+
+/// Label colors used by the SDK.
+class VrtxLabelColors {
+  const VrtxLabelColors({
+    this.primary,
+    this.secondary,
+    this.tertiary,
+    this.quaternary,
+  });
+
+  final String? primary;
+  final String? secondary;
+  final String? tertiary;
+  final String? quaternary;
+
+  Map<String, Object?> toMap() => _nonNullMap({
+    'primary': primary,
+    'secondary': secondary,
+    'tertiary': tertiary,
+    'quaternary': quaternary,
+  });
+}
+
+/// Fill colors used by the SDK.
+class VrtxFillColors {
+  const VrtxFillColors({
+    this.primary,
+    this.secondary,
+    this.tertiary,
+    this.quaternary,
+    this.vibrant,
+  });
+
+  final String? primary;
+  final String? secondary;
+  final String? tertiary;
+  final String? quaternary;
+  final VrtxVibrantFillColors? vibrant;
+
+  Map<String, Object?> toMap() => _nonNullMap({
+    'primary': primary,
+    'secondary': secondary,
+    'tertiary': tertiary,
+    'quaternary': quaternary,
+    'vibrant': vibrant?.toMap(),
+  });
+}
+
+/// Vibrant fill colors used by the SDK.
+class VrtxVibrantFillColors {
+  const VrtxVibrantFillColors({this.secondary});
+
+  final String? secondary;
+
+  Map<String, Object?> toMap() => _nonNullMap({'secondary': secondary});
+}
+
+/// Background colors used by the SDK.
+class VrtxBackgroundColors {
+  const VrtxBackgroundColors({
+    this.primary,
+    this.secondary,
+    this.tertiary,
+    this.primaryElevated,
+    this.secondaryElevated,
+    this.tertiaryElevated,
+  });
+
+  final String? primary;
+  final String? secondary;
+  final String? tertiary;
+  final String? primaryElevated;
+  final String? secondaryElevated;
+  final String? tertiaryElevated;
+
+  Map<String, Object?> toMap() => _nonNullMap({
+    'primary': primary,
+    'secondary': secondary,
+    'tertiary': tertiary,
+    'primaryElevated': primaryElevated,
+    'secondaryElevated': secondaryElevated,
+    'tertiaryElevated': tertiaryElevated,
+  });
+}
+
+/// Gradient background colors used by the SDK.
+class VrtxBackgroundGradientColors {
+  const VrtxBackgroundGradientColors({this.wb01, this.wb02});
+
+  final String? wb01;
+  final String? wb02;
+
+  Map<String, Object?> toMap() => _nonNullMap({'wb01': wb01, 'wb02': wb02});
+}
+
+/// Accent colors used by the SDK.
+class VrtxAccentColors {
+  const VrtxAccentColors({
+    this.red,
+    this.redBg,
+    this.green,
+    this.greenBg,
+    this.orange,
+    this.indigo,
+    this.teal,
+    this.pink,
+    this.cyan,
+    this.purple,
+  });
+
+  final String? red;
+  final String? redBg;
+  final String? green;
+  final String? greenBg;
+  final String? orange;
+  final String? indigo;
+  final String? teal;
+  final String? pink;
+  final String? cyan;
+  final String? purple;
+
+  Map<String, Object?> toMap() => _nonNullMap({
+    'red': red,
+    'redBg': redBg,
+    'green': green,
+    'greenBg': greenBg,
+    'orange': orange,
+    'indigo': indigo,
+    'teal': teal,
+    'pink': pink,
+    'cyan': cyan,
+    'purple': purple,
+  });
+}
+
+/// Spacing overrides, expressed in logical pixels.
+class VrtxSpacing {
+  const VrtxSpacing({
+    this.x0,
+    this.xxs,
+    this.xs,
+    this.sm,
+    this.md,
+    this.ml,
+    this.lg,
+    this.xl,
+    this.xxl,
+    this.xxxl,
+  });
+
+  final double? x0;
+  final double? xxs;
+  final double? xs;
+  final double? sm;
+  final double? md;
+  final double? ml;
+  final double? lg;
+  final double? xl;
+  final double? xxl;
+  final double? xxxl;
+
+  Map<String, Object?> toMap() => _nonNullMap({
+    'x0': x0,
+    'xxs': xxs,
+    'xs': xs,
+    'sm': sm,
+    'md': md,
+    'ml': ml,
+    'lg': lg,
+    'xl': xl,
+    'xxl': xxl,
+    'xxxl': xxxl,
+  });
+}
+
+/// Corner-radius overrides, expressed in logical pixels.
+class VrtxRadius {
+  const VrtxRadius({
+    this.x0,
+    this.xxs,
+    this.xs,
+    this.s,
+    this.sm,
+    this.md,
+    this.ml,
+    this.lg,
+    this.xl,
+    this.xxl,
+    this.xxxl,
+    this.big,
+    this.full,
+    this.huge,
+  });
+
+  final double? x0;
+  final double? xxs;
+  final double? xs;
+  final double? s;
+  final double? sm;
+  final double? md;
+  final double? ml;
+  final double? lg;
+  final double? xl;
+  final double? xxl;
+  final double? xxxl;
+  final double? big;
+  final double? full;
+  final double? huge;
+
+  Map<String, Object?> toMap() => _nonNullMap({
+    'x0': x0,
+    'xxs': xxs,
+    'xs': xs,
+    's': s,
+    'sm': sm,
+    'md': md,
+    'ml': ml,
+    'lg': lg,
+    'xl': xl,
+    'xxl': xxl,
+    'xxxl': xxxl,
+    'big': big,
+    'full': full,
+    'huge': huge,
+  });
+}
+
+/// Component-sizing overrides, expressed in logical pixels.
+class VrtxSizing {
+  const VrtxSizing({
+    this.xxs,
+    this.xs,
+    this.sm,
+    this.md,
+    this.lg,
+    this.xl,
+    this.xxl,
+    this.xxxl,
+  });
+
+  final double? xxs;
+  final double? xs;
+  final double? sm;
+  final double? md;
+  final double? lg;
+  final double? xl;
+  final double? xxl;
+  final double? xxxl;
+
+  Map<String, Object?> toMap() => _nonNullMap({
+    'xxs': xxs,
+    'xs': xs,
+    'sm': sm,
+    'md': md,
+    'lg': lg,
+    'xl': xl,
+    'xxl': xxl,
+    'xxxl': xxxl,
+  });
+}
+
+/// Optional brand and design-token overrides for the native SDK UI.
+class VrtxThemeOptions {
+  /// Creates optional theme overrides. Image values must be remote URLs.
+  const VrtxThemeOptions({
+    this.cardImage,
+    this.brandLogo,
+    this.brandName,
+    this.colors,
+    this.spacing,
+    this.radius,
+    this.sizing,
+  });
+
+  final String? cardImage;
+  final String? brandLogo;
+  final String? brandName;
+  final VrtxColors? colors;
+  final VrtxSpacing? spacing;
+  final VrtxRadius? radius;
+  final VrtxSizing? sizing;
+
+  Map<String, Object?> toMap() => _nonNullMap({
+    'cardImage': cardImage,
+    'brandLogo': brandLogo,
+    'brandName': brandName,
+    'colors': colors?.toMap(),
+    'spacing': spacing?.toMap(),
+    'radius': radius?.toMap(),
+    'sizing': sizing?.toMap(),
+  });
+}
+
+Map<String, Object?> _nonNullMap(Map<String, Object?> values) =>
+    Map<String, Object?>.fromEntries(
+      values.entries.where((entry) => entry.value != null),
+    );
+
 // ─── Error model ─────────────────────────────────────────────────────────────
 
 /// Error thrown by [Vrtx.setup] when the native SDK reports a failure.
@@ -63,6 +416,16 @@ class Vrtx {
   const Vrtx._();
 
   static const MethodChannel _channel = MethodChannel('vrtx_flutter');
+  static VoidCallback? _onExit;
+  static bool _handlerInstalled = false;
+
+  static void _ensureHandler() {
+    if (_handlerInstalled) return;
+    _handlerInstalled = true;
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == 'onExit') _onExit?.call();
+    });
+  }
 
   /// Authenticates with Vrtx and launches the SDK's own UI flow.
   ///
@@ -79,6 +442,9 @@ class Vrtx {
   /// - [externalReference] Optional app-provided SDK session reference.
   /// - [fontFamily]   Optional font-family name already registered in the
   ///                  host app. Pass `null` to use the SDK default.
+  /// - [designOption] Optional native design variant.
+  /// - [theme]        Optional native theme and design-token overrides.
+  /// - [onExit]       Called when the user closes the native SDK flow.
   static Future<void> setup({
     required String clientId,
     required String clientSecret,
@@ -87,7 +453,12 @@ class Vrtx {
     required Mode mode,
     String? externalReference,
     String? fontFamily,
+    DesignOption? designOption,
+    VrtxThemeOptions? theme,
+    VoidCallback? onExit,
   }) async {
+    _ensureHandler();
+    _onExit = onExit;
     try {
       await _channel.invokeMethod<void>('setup', <String, Object?>{
         'clientId': clientId,
@@ -97,6 +468,8 @@ class Vrtx {
         'mode': mode.name,
         'externalReference': externalReference,
         'fontFamily': fontFamily,
+        'designOption': designOption?.name,
+        'theme': theme?.toMap(),
       });
     } on PlatformException catch (e) {
       throw VrtxError(

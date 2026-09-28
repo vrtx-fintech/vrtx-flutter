@@ -17,6 +17,15 @@ void main() {
     });
   });
 
+  group('Design option channel contract', () {
+    test('exposes exactly the values both native bridges accept', () {
+      expect(
+        DesignOption.values.map((e) => e.name).toSet(),
+        {'optionA', 'optionB', 'optionC'},
+      );
+    });
+  });
+
   group('Language and Mode channel contracts', () {
     test('Language names match the native bridges', () {
       expect(
