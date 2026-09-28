@@ -30,6 +30,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isEnglish = true;
+  bool _isLoading = false;
 
   static const List<_FontOption> _englishFonts = [
     _FontOption('Inter', 'Inter'),
@@ -101,7 +102,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String get _buttonLabel => _isEnglish ? 'Get Started' : 'ابدأ الآن';
 
+  String get _loadingLabel => _isEnglish ? 'Loading...' : 'جار التحميل...';
+
   Future<void> _launchVrtx() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+
     try {
       await Vrtx.setup(
         clientId: vrtxClientId,
@@ -124,6 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
           context,
         ).showSnackBar(SnackBar(content: Text('[${e.status}] ${e.message}')));
       }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -299,17 +307,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 56,
                   child: FilledButton.icon(
-                    onPressed: _launchVrtx,
-                    icon: Icon(
-                      _isEnglish
-                          ? Icons.arrow_forward_rounded
-                          : Icons.arrow_back_rounded,
-                      size: 19,
-                    ),
-                    label: Text(_buttonLabel),
+                    onPressed: _isLoading ? null : _launchVrtx,
+                    icon: _isLoading
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Icon(
+                            _isEnglish
+                                ? Icons.arrow_forward_rounded
+                                : Icons.arrow_back_rounded,
+                            size: 19,
+                          ),
+                    label: Text(_isLoading ? _loadingLabel : _buttonLabel),
                     style: FilledButton.styleFrom(
                       backgroundColor: const Color(0xFF111111),
+                      disabledBackgroundColor: const Color(0xFF8D9198),
                       foregroundColor: Colors.white,
+                      disabledForegroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(17),
                       ),

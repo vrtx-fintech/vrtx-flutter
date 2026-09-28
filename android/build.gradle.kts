@@ -36,5 +36,5 @@ configurations.configureEach {
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2026.05.01"))
     implementation("androidx.compose.ui:ui")
-    implementation("sa.vrtx.sa:vrtx-android:0.1.7")
+    implementation("sa.vrtx.sa:vrtx-android:0.1.9")
 }

@@ -4,6 +4,8 @@ import VRTX
 
 public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
 
+    private var channel: FlutterMethodChannel!
+
     // ── Registration ──────────────────────────────────────────────────────────
 
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -12,6 +14,7 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
             binaryMessenger: registrar.messenger()
         )
         let instance = VrtxFlutterPlugin()
+        instance.channel = channel
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
 
@@ -46,6 +49,14 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
 
         let externalReference = args["externalReference"] as? String
         let fontFamily = args["fontFamily"] as? String  // nullable → nil uses SDK default
+        let designOption: DesignOption = {
+            switch args["designOption"] as? String {
+            case "optionA": return .optionA
+            case "optionB": return .optionB
+            default: return .optionC
+            }
+        }()
+        let theme = themeOptions(from: args["theme"] as? [String: Any])
 
         // Reject unknown values rather than defaulting: a silent fallback can
         // point an integrator at the wrong backend without any signal, the
@@ -89,9 +100,16 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
             language:     language,
             externalReference: externalReference,
             fontFamily:   fontFamily ?? "",           // nil → SDK default font
+            designOption: designOption,
+            theme:        theme,
             onSuccess: {
                 DispatchQueue.main.async {
                     result(nil)                 // Future completes normally
+                }
+            },
+            onExit: {
+                DispatchQueue.main.async {
+                    self.channel.invokeMethod("onExit", arguments: nil)
                 }
             },
             onError: { error in
@@ -106,4 +124,119 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
             }
         )
     }
+
+    private func themeOptions(from object: [String: Any]?) -> ThemeOptions? {
+        guard let object else { return nil }
+
+        func text(_ object: [String: Any]?, _ key: String) -> String? {
+            object?[key] as? String
+        }
+        func number(_ object: [String: Any]?, _ key: String) -> CGFloat? {
+            guard let value = object?[key] as? NSNumber else { return nil }
+            return CGFloat(value.doubleValue)
+        }
+        func child(_ object: [String: Any]?, _ key: String) -> [String: Any]? {
+            object?[key] as? [String: Any]
+        }
+
+        let options = ThemeOptions()
+        options.brandName = text(object, "brandName")
+        if let value = text(object, "cardImage"), let url = URL(string: value) {
+            options.cardImage = .remote(url)
+        }
+        if let value = text(object, "brandLogo"), let url = URL(string: value) {
+            options.brandLogo = .remote(url)
+        }
+
+        if let colors = child(object, "colors") {
+            let allBrands = child(colors, "allBrands").map {
+                VrtxColors.AllBrands(
+                    primary: text($0, "primary"),
+                    buttonLabel: text($0, "buttonLabel"),
+                )
+            }
+            let labels = child(colors, "labels").map {
+                VrtxColors.Labels(
+                    primary: text($0, "primary"),
+                    secondary: text($0, "secondary"),
+                    tertiary: text($0, "tertiary"),
+                    quaternary: text($0, "quaternary"),
+                )
+            }
+            let fills = child(colors, "fills").map { value in
+                VrtxColors.Fills(
+                    primary: text(value, "primary"),
+                    secondary: text(value, "secondary"),
+                    tertiary: text(value, "tertiary"),
+                    quaternary: text(value, "quaternary"),
+                    vibrant: child(value, "vibrant").map {
+                        VrtxColors.Fills.Vibrant(secondary: text($0, "secondary"))
+                    },
+                )
+            }
+            let backgrounds = child(colors, "backgrounds").map {
+                VrtxColors.Backgrounds(
+                    primary: text($0, "primary"),
+                    secondary: text($0, "secondary"),
+                    tertiary: text($0, "tertiary"),
+                    primaryElevated: text($0, "primaryElevated"),
+                    secondaryElevated: text($0, "secondaryElevated"),
+                    tertiaryElevated: text($0, "tertiaryElevated"),
+                )
+            }
+            let gradients = child(colors, "backgroundsGradient").map {
+                VrtxColors.BackgroundsGradient(
+                    wb01: text($0, "wb01"), wb02: text($0, "wb02"),
+                )
+            }
+            let accents = child(colors, "accents").map {
+                VrtxColors.Accents(
+                    red: text($0, "red"), redBg: text($0, "redBg"),
+                    green: text($0, "green"), greenBg: text($0, "greenBg"),
+                    orange: text($0, "orange"), indigo: text($0, "indigo"),
+                    teal: text($0, "teal"), pink: text($0, "pink"),
+                    cyan: text($0, "cyan"), purple: text($0, "purple"),
+                )
+            }
+            options.colors = VrtxColors(
+                allBrands: allBrands,
+                labels: labels,
+                fills: fills,
+                backgrounds: backgrounds,
+                backgroundsGradient: gradients,
+                accents: accents,
+            )
+        }
+
+        if let spacing = child(object, "spacing") {
+            options.spacing = VrtxSpacing(
+                x0: number(spacing, "x0"), xxs: number(spacing, "xxs"),
+                xs: number(spacing, "xs"), sm: number(spacing, "sm"),
+                md: number(spacing, "md"), ml: number(spacing, "ml"),
+                lg: number(spacing, "lg"), xl: number(spacing, "xl"),
+                xxl: number(spacing, "xxl"), xxxl: number(spacing, "xxxl"),
+            )
+        }
+        if let radius = child(object, "radius") {
+            options.radius = VrtxRadius(
+                x0: number(radius, "x0"), xxs: number(radius, "xxs"),
+                xs: number(radius, "xs"), s: number(radius, "s"),
+                sm: number(radius, "sm"), md: number(radius, "md"),
+                ml: number(radius, "ml"), lg: number(radius, "lg"),
+                xl: number(radius, "xl"), xxl: number(radius, "xxl"),
+                xxxl: number(radius, "xxxl"), big: number(radius, "big"),
+                full: number(radius, "full"), huge: number(radius, "huge"),
+            )
+        }
+        if let sizing = child(object, "sizing") {
+            options.sizing = VrtxSizing(
+                xxs: number(sizing, "xxs"), xs: number(sizing, "xs"),
+                sm: number(sizing, "sm"), md: number(sizing, "md"),
+                lg: number(sizing, "lg"), xl: number(sizing, "xl"),
+                xxl: number(sizing, "xxl"), xxxl: number(sizing, "xxxl"),
+            )
+        }
+        return options
+    }
+
 }

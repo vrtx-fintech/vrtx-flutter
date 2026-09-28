@@ -10,13 +10,21 @@ import io.flutter.plugin.common.MethodChannel.Result
 
 import android.app.Activity
 import android.graphics.Typeface
+import android.net.Uri
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
 import org.json.JSONArray
 
 import sa.vrtx.public.Vrtx
+import sa.vrtx.public.configuration.DesignOption
 import sa.vrtx.public.configuration.Environment
 import sa.vrtx.public.configuration.Language
 import sa.vrtx.public.configuration.Mode
+import sa.vrtx.public.configuration.theme.ThemeOptions
+import sa.vrtx.public.configuration.theme.VrtxColors
+import sa.vrtx.public.configuration.theme.VrtxRadius
+import sa.vrtx.public.configuration.theme.VrtxSpacing
 
 class VrtxFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
@@ -79,6 +87,8 @@ class VrtxFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         val clientSecret = call.argument<String>("clientSecret")!!
         val externalReference = call.argument<String?>("externalReference")
         val fontFamily   = call.argument<String?>("fontFamily")
+        val designOption = parseDesignOption(call.argument<String?>("designOption"))
+        val theme = parseThemeOptions(call.argument<Map<String, Any?>>("theme"))
 
         // Reject unknown values rather than defaulting: a silent fallback can
         // point an integrator at the wrong backend without any signal, the
@@ -119,10 +129,15 @@ class VrtxFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     environment  = environment,
                     language     = language,
                     mode         = mode,
+                    designOption = designOption,
+                    theme        = theme,
                     externalReference = externalReference,
                     fontFamily   = composeFontFamily,
                     onSuccess    = {
                         result.success(null)
+                    },
+                    onExit       = {
+                        channel.invokeMethod("onExit", null)
                     },
                     onError      = { error ->
                         result.error(
@@ -140,6 +155,104 @@ class VrtxFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 )
             }
         }
+    }
+
+    private fun parseDesignOption(name: String?): DesignOption = when (name) {
+        "optionA" -> DesignOption.OptionA
+        "optionB" -> DesignOption.OptionB
+        else -> DesignOption.OptionC
+    }
+
+    private fun parseThemeColor(value: String): Color? {
+        val rgba = Regex(
+            """rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9.]+)\s*\)""",
+        ).matchEntire(value.trim())
+        if (rgba != null) {
+            val red = rgba.groupValues[1].toIntOrNull() ?: return null
+            val green = rgba.groupValues[2].toIntOrNull() ?: return null
+            val blue = rgba.groupValues[3].toIntOrNull() ?: return null
+            val alpha = ((rgba.groupValues[4].toFloatOrNull() ?: return null) * 255).toInt()
+            return Color(android.graphics.Color.argb(alpha, red, green, blue))
+        }
+        return runCatching { Color(android.graphics.Color.parseColor(value)) }.getOrNull()
+    }
+
+    private fun parseThemeOptions(value: Map<String, Any?>?): ThemeOptions? {
+        val root = value ?: return null
+        fun child(parent: Map<*, *>?, key: String): Map<*, *>? =
+            parent?.get(key) as? Map<*, *>
+        fun text(parent: Map<*, *>?, key: String): String? =
+            (parent?.get(key) as? String)?.takeIf { it.isNotBlank() }
+        fun color(parent: Map<*, *>?, key: String): Color? =
+            text(parent, key)?.let(::parseThemeColor)
+        fun dp(parent: Map<*, *>?, key: String) =
+            (parent?.get(key) as? Number)?.toDouble()?.toFloat()?.dp
+
+        val colors = child(root, "colors")
+        val themeColors = colors?.let {
+            VrtxColors(
+                allBrands = child(it, "allBrands")?.let { value ->
+                    VrtxColors.AllBrands(color(value, "primary"), color(value, "buttonLabel"))
+                },
+                labels = child(it, "labels")?.let { value ->
+                    VrtxColors.Labels(
+                        color(value, "primary"), color(value, "secondary"),
+                        color(value, "tertiary"), color(value, "quaternary"),
+                    )
+                },
+                fills = child(it, "fills")?.let { value ->
+                    VrtxColors.Fills(
+                        primary = color(value, "primary"),
+                        secondary = color(value, "secondary"),
+                        tertiary = color(value, "tertiary"),
+                        quaternary = color(value, "quaternary"),
+                        vibrant = child(value, "vibrant")?.let { vibrant ->
+                            VrtxColors.Fills.Vibrant(color(vibrant, "secondary"))
+                        },
+                    )
+                },
+                backgrounds = child(it, "backgrounds")?.let { value ->
+                    VrtxColors.Backgrounds(
+                        primary = color(value, "primary"),
+                        secondary = color(value, "secondary"),
+                    )
+                },
+                backgroundsGradient = child(it, "backgroundsGradient")?.let { value ->
+                    VrtxColors.BackgroundsGradients(
+                        color(value, "wb01"), color(value, "wb02"),
+                    )
+                },
+                accents = child(it, "accents")?.let { value ->
+                    VrtxColors.Accents(
+                        red = color(value, "red"),
+                        green = color(value, "green"),
+                        greenBg = color(value, "greenBg"),
+                    )
+                },
+            )
+        }
+
+        return ThemeOptions(
+            cardImage = text(root, "cardImage")?.let(Uri::parse),
+            brandLogo = text(root, "brandLogo")?.let(Uri::parse),
+            brandName = text(root, "brandName"),
+            colors = themeColors,
+            spacing = child(root, "spacing")?.let { value ->
+                VrtxSpacing(
+                    x0 = dp(value, "x0"), xxs = dp(value, "xxs"),
+                    xs = dp(value, "xs"), sm = dp(value, "sm"),
+                    md = dp(value, "md"), ml = dp(value, "ml"),
+                    lg = dp(value, "lg"),
+                )
+            },
+            radius = child(root, "radius")?.let { value ->
+                VrtxRadius(
+                    s = dp(value, "s"), sm = dp(value, "sm"),
+                    md = dp(value, "md"), lg = dp(value, "lg"),
+                    full = dp(value, "full"), huge = dp(value, "huge"),
+                )
+            },
+        )
     }
 
     private fun resolveFontFamily(activity: Activity, fontFamily: String?): FontFamily {
