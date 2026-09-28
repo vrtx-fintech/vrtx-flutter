@@ -175,13 +175,13 @@ full native rebuild after changing the hash.
 
 The Flutter API mirrors the native SDK public configuration contract:
 
-| Parameter       | Type              | Values |
-| --------------- | ----------------- | ------ |
-| `environment`   | `Environment`     | `Environment.sandbox`, `Environment.production` |
-| `language`      | `Language`        | `Language.english`, `Language.arabic` |
-| `mode`          | `Mode`            | `Mode.light`, `Mode.dark` |
-| `designOption`  | `DesignOption`    | `DesignOption.optionA`, `DesignOption.optionB`, `DesignOption.optionC` |
-| `theme`         | `VrtxThemeOptions` | Optional brand and design-token overrides |
+| Parameter      | Type               | Values                                                                 |
+| -------------- | ------------------ | ---------------------------------------------------------------------- |
+| `environment`  | `Environment`      | `Environment.sandbox`, `Environment.production`                        |
+| `language`     | `Language`         | `Language.english`, `Language.arabic`                                  |
+| `mode`         | `Mode`             | `Mode.light`, `Mode.dark`                                              |
+| `designOption` | `DesignOption`     | `DesignOption.optionA`, `DesignOption.optionB`, `DesignOption.optionC` |
+| `theme`        | `VrtxThemeOptions` | Optional brand and design-token overrides                              |
 
 `externalReference` may be passed with an app-provided SDK session reference.
 `fontFamily` may be passed with the name of a font already bundled in the host app.
@@ -195,41 +195,41 @@ Every theme field is optional and omitted fields retain the native SDK defaults.
 
 `VrtxThemeOptions` accepts these top-level keys:
 
-| Key | Type |
-| --- | --- |
+| Key         | Type                       |
+| ----------- | -------------------------- |
 | `cardImage` | `String?` remote image URL |
 | `brandLogo` | `String?` remote image URL |
-| `brandName` | `String?` |
-| `colors` | `VrtxColors?` |
-| `spacing` | `VrtxSpacing?` |
-| `radius` | `VrtxRadius?` |
-| `sizing` | `VrtxSizing?` |
+| `brandName` | `String?`                  |
+| `colors`    | `VrtxColors?`              |
+| `spacing`   | `VrtxSpacing?`             |
+| `radius`    | `VrtxRadius?`              |
+| `sizing`    | `VrtxSizing?`              |
 
 `VrtxColors` contains these groups and keys:
 
-| Group | Keys |
-| --- | --- |
-| `allBrands` | `primary`, `buttonLabel` |
-| `labels` | `primary`, `secondary`, `tertiary`, `quaternary` |
-| `fills` | `primary`, `secondary`, `tertiary`, `quaternary`, `vibrant.secondary` |
-| `backgrounds` | `primary`, `secondary`, `tertiary`, `primaryElevated`, `secondaryElevated`, `tertiaryElevated` |
-| `backgroundsGradient` | `wb01`, `wb02` |
-| `accents` | `red`, `redBg`, `green`, `greenBg`, `orange`, `indigo`, `teal`, `pink`, `cyan`, `purple` |
+| Group                 | Keys                                                                                           |
+| --------------------- | ---------------------------------------------------------------------------------------------- |
+| `allBrands`           | `primary`, `buttonLabel`                                                                       |
+| `labels`              | `primary`, `secondary`, `tertiary`, `quaternary`                                               |
+| `fills`               | `primary`, `secondary`, `tertiary`, `quaternary`, `vibrant.secondary`                          |
+| `backgrounds`         | `primary`, `secondary`, `tertiary`, `primaryElevated`, `secondaryElevated`, `tertiaryElevated` |
+| `backgroundsGradient` | `wb01`, `wb02`                                                                                 |
+| `accents`             | `red`, `redBg`, `green`, `greenBg`, `orange`, `indigo`, `teal`, `pink`, `cyan`, `purple`       |
 
 The numeric token groups accept these keys:
 
-| Group | Keys |
-| --- | --- |
-| `spacing` | `x0`, `xxs`, `xs`, `sm`, `md`, `ml`, `lg`, `xl`, `xxl`, `xxxl` |
-| `radius` | `x0`, `xxs`, `xs`, `s`, `sm`, `md`, `ml`, `lg`, `xl`, `xxl`, `xxxl`, `big`, `full`, `huge` |
-| `sizing` | `xxs`, `xs`, `sm`, `md`, `lg`, `xl`, `xxl`, `xxxl` |
+| Group     | Keys                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------ |
+| `spacing` | `x0`, `xxs`, `xs`, `sm`, `md`, `ml`, `lg`, `xl`, `xxl`, `xxxl`                             |
+| `radius`  | `x0`, `xxs`, `xs`, `s`, `sm`, `md`, `ml`, `lg`, `xl`, `xxl`, `xxxl`, `big`, `full`, `huge` |
+| `sizing`  | `xxs`, `xs`, `sm`, `md`, `lg`, `xl`, `xxl`, `xxxl`                                         |
 
 ## Result
 
-| Result  | Dart behavior                          |
-| ------- | -------------------------------------- |
-| Success | `Vrtx.setup(...)` completes normally   |
-| Error   | `Vrtx.setup(...)` throws a `VrtxError` |
+| Result  | Dart behavior                             |
+| ------- | ----------------------------------------- |
+| Success | `Vrtx.setup(...)` completes normally      |
+| Error   | `Vrtx.setup(...)` throws a `VrtxError`    |
 | Exit    | `onExit` runs when the native flow closes |
 
 `VrtxError` contains a native `status` code and a human-readable `message`.
