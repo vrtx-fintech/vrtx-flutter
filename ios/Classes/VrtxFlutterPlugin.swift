@@ -107,11 +107,6 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
                     result(nil)                 // Future completes normally
                 }
             },
-            onExit: {
-                DispatchQueue.main.async {
-                    self.channel.invokeMethod("onExit", arguments: nil)
-                }
-            },
             onError: { error in
                 DispatchQueue.main.async {
                     result(FlutterError(
@@ -120,6 +115,11 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
                         message: error.message,
                         details: nil
                     ))
+                }
+            },
+            onExit: {
+                DispatchQueue.main.async {
+                    self.channel.invokeMethod("onExit", arguments: nil)
                 }
             }
         )
@@ -178,10 +178,6 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
                 VrtxColors.Backgrounds(
                     primary: text($0, "primary"),
                     secondary: text($0, "secondary"),
-                    tertiary: text($0, "tertiary"),
-                    primaryElevated: text($0, "primaryElevated"),
-                    secondaryElevated: text($0, "secondaryElevated"),
-                    tertiaryElevated: text($0, "tertiaryElevated"),
                 )
             }
             let gradients = child(colors, "backgroundsGradient").map {
@@ -193,9 +189,6 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
                 VrtxColors.Accents(
                     red: text($0, "red"), redBg: text($0, "redBg"),
                     green: text($0, "green"), greenBg: text($0, "greenBg"),
-                    orange: text($0, "orange"), indigo: text($0, "indigo"),
-                    teal: text($0, "teal"), pink: text($0, "pink"),
-                    cyan: text($0, "cyan"), purple: text($0, "purple"),
                 )
             }
             options.colors = VrtxColors(
@@ -213,27 +206,15 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
                 x0: number(spacing, "x0"), xxs: number(spacing, "xxs"),
                 xs: number(spacing, "xs"), sm: number(spacing, "sm"),
                 md: number(spacing, "md"), ml: number(spacing, "ml"),
-                lg: number(spacing, "lg"), xl: number(spacing, "xl"),
-                xxl: number(spacing, "xxl"), xxxl: number(spacing, "xxxl"),
+                lg: number(spacing, "lg"),
             )
         }
         if let radius = child(object, "radius") {
             options.radius = VrtxRadius(
-                x0: number(radius, "x0"), xxs: number(radius, "xxs"),
-                xs: number(radius, "xs"), s: number(radius, "s"),
-                sm: number(radius, "sm"), md: number(radius, "md"),
-                ml: number(radius, "ml"), lg: number(radius, "lg"),
-                xl: number(radius, "xl"), xxl: number(radius, "xxl"),
-                xxxl: number(radius, "xxxl"), big: number(radius, "big"),
+                s: number(radius, "s"), sm: number(radius, "sm"),
+                md: number(radius, "md"), ml: number(radius, "ml"),
+                lg: number(radius, "lg"), xl: number(radius, "xl"),
                 full: number(radius, "full"), huge: number(radius, "huge"),
-            )
-        }
-        if let sizing = child(object, "sizing") {
-            options.sizing = VrtxSizing(
-                xxs: number(sizing, "xxs"), xs: number(sizing, "xs"),
-                sm: number(sizing, "sm"), md: number(sizing, "md"),
-                lg: number(sizing, "lg"), xl: number(sizing, "xl"),
-                xxl: number(sizing, "xxl"), xxxl: number(sizing, "xxxl"),
             )
         }
         return options
