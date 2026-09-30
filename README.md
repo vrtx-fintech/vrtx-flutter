@@ -132,7 +132,7 @@ Then run `pod install` from your `ios/` directory.
 | Kotlin                | 2.4.10  |
 | JVM target            | 17      |
 
-The Flutter plugin uses `sa.vrtx.sa:vrtx-android:0.1.9` on Android and the
+The Flutter plugin uses `sa.vrtx.sa:vrtx-android:0.1.13` on Android and the
 `VRTX` CocoaPod `0.1.15` on iOS. `vrtx-android` uses Talsec freeRASP to verify
 the host app's package name and signing certificate. Configure the required repositories in
 `android/settings.gradle.kts`:
@@ -141,7 +141,6 @@ the host app's package name and signing certificate. Configure the required repo
 dependencyResolutionManagement {
     repositories {
         google()
-        maven(url = "https://europe-west3-maven.pkg.dev/talsec-artifact-repository/freerasp")
         maven(url = "https://jitpack.io")
         mavenCentral()
     }

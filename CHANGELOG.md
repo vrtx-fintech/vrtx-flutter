@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5
+
+- Android: upgrade `vrtx-android` to 0.1.13 and resolve it from Maven Central.
+- Android: include FreeRASP threat codes in reported security verification errors.
+
 ## 0.1.4
 
 - iOS: bump `VRTX` to 0.1.11, the latest published pod.
