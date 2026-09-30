@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import org.json.JSONArray
 
 import sa.vrtx.public.Vrtx
+import sa.vrtx.public.error.SecurityVerificationError
 import sa.vrtx.public.configuration.DesignOption
 import sa.vrtx.public.configuration.Environment
 import sa.vrtx.public.configuration.Language
@@ -140,10 +141,18 @@ class VrtxFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         channel.invokeMethod("onExit", null)
                     },
                     onError      = { error ->
+                        val threatCode = (error as? SecurityVerificationError)?.threatCode
+                        val errorMessage = error.message?.let { message ->
+                            threatCode?.let { code -> "$message ($code)" } ?: message
+                        } ?: "Unknown error"
                         result.error(
-                            error::class.simpleName ?: "VRTX_ERROR",
-                            error.message ?: "Unknown error",
+                            "VRX_ERROR",
+                            errorMessage,
                             null
+                        )
+                        channel.invokeMethod(
+                            "onError",
+                            mapOf("code" to "VRX_ERROR", "message" to errorMessage)
                         )
                     }
                 )
