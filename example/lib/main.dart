@@ -2,19 +2,164 @@ import 'package:flutter/material.dart';
 import 'package:vrtx_flutter/vrtx_flutter.dart';
 import 'package:vrtx_flutter_example/local_config.dart';
 
+/// Single source of truth for the example app and the native Vrtx UI.
+///
+/// The returned object is passed unchanged to [Vrtx.setup].
+VrtxThemeOptions greenThemeFor(Mode mode) {
+  final isDark = mode == Mode.dark;
+  String color(String light, String dark) => isDark ? dark : light;
+
+  return VrtxThemeOptions(
+    brandName: 'vrtx Pay',
+    colors: VrtxColors(
+      allBrands: VrtxAllBrandColors(
+        primary: color('#16804F', '#62C891'),
+        buttonLabel: color('#FFFFFF', '#071B13'),
+      ),
+      labels: VrtxLabelColors(
+        primary: color('#12352A', '#F0FAF4'),
+        secondary: color('#5A7168', '#B7D3C3'),
+        tertiary: color('#82988E', '#94B8A4'),
+        quaternary: color('#AFC0B8', '#729985'),
+      ),
+      fills: VrtxFillColors(
+        primary: color('#E4F4EC', '#1C4A34'),
+        secondary: color('#D4EDDF', '#265E42'),
+        tertiary: color('#BEDFCE', '#337752'),
+        quaternary: color('#A6D1BB', '#439463'),
+        vibrant: VrtxVibrantFillColors(
+          secondary: color('#62D49A', '#62C891'),
+        ),
+      ),
+      backgrounds: VrtxBackgroundColors(
+        primary: color('#F4FBF7', '#071B13'),
+        secondary: color('#F8FCF9', '#102B20'),
+      ),
+      backgroundsGradient: VrtxBackgroundGradientColors(
+        wb01: color('#E4F4EC', '#102B20'),
+        wb02: color('#DDF3E7', '#153A2A'),
+      ),
+      accents: VrtxAccentColors(
+        red: '#D9534F',
+        green: color('#16804F', '#62C891'),
+        greenBg: color('#DDF3E7', '#194A3A'),
+      ),
+    ),
+    spacing: const VrtxSpacing(
+      x0: 0,
+      xxs: 2,
+      xs: 4,
+      sm: 8,
+      md: 12,
+      ml: 16,
+      lg: 20,
+    ),
+    radius: const VrtxRadius(
+      s: 6,
+      sm: 8,
+      md: 12,
+      lg: 20,
+      full: 999,
+      huge: 64,
+    ),
+  );
+}
+
+Color _color(String? value, Color fallback) {
+  if (value == null) return fallback;
+  final hex = value.replaceFirst('#', '');
+  final normalized = hex.length == 6 ? 'FF$hex' : hex;
+  final parsed = int.tryParse(normalized, radix: 16);
+  return parsed == null ? fallback : Color(parsed);
+}
+
+ThemeData _materialThemeFrom(VrtxThemeOptions options, Mode mode) {
+  final isDark = mode == Mode.dark;
+  final brightness = isDark ? Brightness.dark : Brightness.light;
+  final colors = options.colors;
+  final primary = _color(
+    colors?.allBrands?.primary,
+    Color(isDark ? 0xFF62C891 : 0xFF16804F),
+  );
+  final onPrimary = _color(
+    colors?.allBrands?.buttonLabel,
+    Color(isDark ? 0xFF071B13 : 0xFFFFFFFF),
+  );
+  final surface = _color(
+    colors?.backgrounds?.primary,
+    Color(isDark ? 0xFF071B13 : 0xFFF4FBF7),
+  );
+  final surfaceElevated = _color(
+    colors?.backgrounds?.secondary,
+    Color(isDark ? 0xFF102B20 : 0xFFF8FCF9),
+  );
+  final onSurface = _color(
+    colors?.labels?.primary,
+    Color(isDark ? 0xFFF0FAF4 : 0xFF12352A),
+  );
+  final onSurfaceVariant = _color(
+    colors?.labels?.secondary,
+    Color(isDark ? 0xFFB7D3C3 : 0xFF5A7168),
+  );
+  final outline = _color(
+    colors?.fills?.tertiary,
+    Color(isDark ? 0xFF337752 : 0xFFBEDFCE),
+  );
+
+  return ThemeData(
+    colorScheme:
+        ColorScheme.fromSeed(
+          seedColor: primary,
+          brightness: brightness,
+        ).copyWith(
+          primary: primary,
+          onPrimary: onPrimary,
+          primaryContainer: _color(
+            colors?.fills?.primary,
+            Color(isDark ? 0xFF1C4A34 : 0xFFE4F4EC),
+          ),
+          onPrimaryContainer: onSurface,
+          surface: surface,
+          surfaceContainerLowest: surfaceElevated,
+          onSurface: onSurface,
+          onSurfaceVariant: onSurfaceVariant,
+          outline: outline,
+          outlineVariant: _color(
+            colors?.fills?.secondary,
+            Color(isDark ? 0xFF265E42 : 0xFFD4EDDF),
+          ),
+        ),
+    scaffoldBackgroundColor: surface,
+  );
+}
+
 void main() => runApp(const ExampleApp());
 
 /// Root widget for the Vrtx Flutter example app.
-class ExampleApp extends StatelessWidget {
+class ExampleApp extends StatefulWidget {
   /// Creates an [ExampleApp].
   const ExampleApp({super.key});
 
   @override
+  State<ExampleApp> createState() => _ExampleAppState();
+}
+
+class _ExampleAppState extends State<ExampleApp> {
+  Mode _mode = Mode.light;
+
+  @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    final theme = greenThemeFor(_mode);
+
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'vrtx-flutter Example',
-      home: HomeScreen(),
+      theme: _materialThemeFrom(theme, _mode),
+      home: HomeScreen(
+        mode: _mode,
+        theme: theme,
+        onModeChanged: (mode) => setState(() => _mode = mode),
+      ),
     );
   }
 }
@@ -22,7 +167,21 @@ class ExampleApp extends StatelessWidget {
 /// Landing screen demonstrating the Vrtx Flutter SDK.
 class HomeScreen extends StatefulWidget {
   /// Creates a [HomeScreen].
-  const HomeScreen({super.key});
+  const HomeScreen({
+    required this.mode,
+    required this.theme,
+    required this.onModeChanged,
+    super.key,
+  });
+
+  /// Current SDK appearance mode.
+  final Mode mode;
+
+  /// Theme options sent to the native SDK.
+  final VrtxThemeOptions theme;
+
+  /// Updates the appearance mode for the app and the SDK.
+  final ValueChanged<Mode> onModeChanged;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -81,6 +240,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String get _languageLabel => _isEnglish ? 'Language' : 'اللغة';
 
+  String get _modeLabel => _isEnglish ? 'Appearance' : 'المظهر';
+
+  String get _lightModeLabel => _isEnglish ? 'Light' : 'فاتح';
+
+  String get _darkModeLabel => _isEnglish ? 'Dark' : 'داكن';
+
   String get _fontLabel => _isEnglish ? 'English Font' : 'الخط العربي';
 
   String get _externalReferenceLabel =>
@@ -114,7 +279,8 @@ class _HomeScreenState extends State<HomeScreen> {
         clientSecret: vrtxClientSecret,
         environment: _environment,
         language: _language,
-        mode: Mode.light,
+        mode: widget.mode,
+        theme: widget.theme,
         externalReference: _externalReferenceController.text.trim().isEmpty
             ? null
             : _externalReferenceController.text.trim(),
@@ -137,10 +303,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Directionality(
       textDirection: _isEnglish ? TextDirection.ltr : TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: colors.surface,
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -155,13 +323,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 52,
                       padding: const EdgeInsets.all(11),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colors.surfaceContainerLowest,
                         borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x12000000),
+                            color: colors.shadow.withValues(alpha: 0.07),
                             blurRadius: 18,
-                            offset: Offset(0, 6),
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
@@ -173,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEAF5EF),
+                        color: colors.primaryContainer,
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Row(
@@ -182,8 +350,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           Container(
                             width: 7,
                             height: 7,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF3C9B66),
+                            decoration: BoxDecoration(
+                              color: colors.primary,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -191,7 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             _environmentLabel,
                             style: TextStyle(
-                              color: const Color(0xFF287348),
+                              color: colors.primary,
                               fontFamily: _fontFamily,
                               fontSize: 10,
                               fontWeight: FontWeight.w800,
@@ -208,7 +376,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _title,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: const Color(0xFF111111),
+                    color: colors.onSurface,
                     fontFamily: _fontFamily,
                     fontSize: 30,
                     fontWeight: FontWeight.w800,
@@ -220,7 +388,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _subtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: const Color(0xFF7B8087),
+                    color: colors.onSurfaceVariant,
                     fontFamily: _fontFamily,
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
@@ -230,14 +398,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.surfaceContainerLowest,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: const Color(0xFFE9EBEF)),
-                    boxShadow: const [
+                    border: Border.all(color: colors.outlineVariant),
+                    boxShadow: [
                       BoxShadow(
-                        color: Color(0x0A000000),
+                        color: colors.shadow.withValues(alpha: 0.04),
                         blurRadius: 24,
-                        offset: Offset(0, 10),
+                        offset: const Offset(0, 10),
                       ),
                     ],
                   ),
@@ -250,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             _configurationLabel,
                             style: TextStyle(
-                              color: const Color(0xFF111111),
+                              color: colors.onSurface,
                               fontFamily: _fontFamily,
                               fontSize: 15,
                               fontWeight: FontWeight.w800,
@@ -259,7 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             _configurationHint,
                             style: TextStyle(
-                              color: const Color(0xFF9CA1A8),
+                              color: colors.onSurfaceVariant,
                               fontFamily: _fontFamily,
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
@@ -282,6 +450,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         onChanged: (value) {
                           setState(() => _isEnglish = value);
                         },
+                      ),
+                      const SizedBox(height: 18),
+                      _ModeRow(
+                        label: _modeLabel,
+                        mode: widget.mode,
+                        lightLabel: _lightModeLabel,
+                        darkLabel: _darkModeLabel,
+                        fontFamily: _fontFamily,
+                        onChanged: widget.onModeChanged,
                       ),
                       const SizedBox(height: 18),
                       _FontDropdownRow(
@@ -322,10 +499,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                     label: Text(_isLoading ? _loadingLabel : _buttonLabel),
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF111111),
-                      disabledBackgroundColor: const Color(0xFF8D9198),
-                      foregroundColor: Colors.white,
-                      disabledForegroundColor: Colors.white,
+                      backgroundColor: colors.primary,
+                      disabledBackgroundColor: colors.onSurfaceVariant,
+                      foregroundColor: colors.onPrimary,
+                      disabledForegroundColor: colors.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(17),
                       ),
@@ -343,7 +520,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _footerLabel,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: const Color(0xFF9CA1A8),
+                    color: colors.onSurfaceVariant,
                     fontFamily: _fontFamily,
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
@@ -366,10 +543,12 @@ class _ControlLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Text(
       label,
       style: TextStyle(
-        color: const Color(0xFF34383E),
+        color: colors.onSurface,
         fontFamily: fontFamily,
         fontSize: 12,
         fontWeight: FontWeight.w700,
@@ -393,6 +572,8 @@ class _ExternalReferenceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -402,7 +583,7 @@ class _ExternalReferenceRow extends StatelessWidget {
           controller: controller,
           textDirection: TextDirection.ltr,
           style: TextStyle(
-            color: const Color(0xFF17191C),
+            color: colors.onSurface,
             fontFamily: fontFamily,
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -410,30 +591,30 @@ class _ExternalReferenceRow extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: const Color(0xFFA6ABB2),
+              color: colors.onSurfaceVariant,
               fontFamily: fontFamily,
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.tag_rounded,
               size: 19,
-              color: Color(0xFF8B929A),
+              color: colors.onSurfaceVariant,
             ),
             filled: true,
-            fillColor: const Color(0xFFF7F8FA),
+            fillColor: colors.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFFE6E9ED)),
+              borderSide: BorderSide(color: colors.outlineVariant),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFFE6E9ED)),
+              borderSide: BorderSide(color: colors.outlineVariant),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(
-                color: Color(0xFF17191C),
+              borderSide: BorderSide(
+                color: colors.primary,
                 width: 1.4,
               ),
             ),
@@ -463,6 +644,8 @@ class _LanguageRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -472,7 +655,7 @@ class _LanguageRow extends StatelessWidget {
           height: 50,
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: const Color(0xFFF1F3F5),
+            color: colors.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(14),
           ),
           child: Row(
@@ -501,6 +684,114 @@ class _LanguageRow extends StatelessWidget {
   }
 }
 
+class _ModeRow extends StatelessWidget {
+  const _ModeRow({
+    required this.label,
+    required this.mode,
+    required this.lightLabel,
+    required this.darkLabel,
+    required this.fontFamily,
+    required this.onChanged,
+  });
+
+  final String label;
+  final Mode mode;
+  final String lightLabel;
+  final String darkLabel;
+  final String fontFamily;
+  final ValueChanged<Mode> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _ControlLabel(label: label, fontFamily: fontFamily),
+        const SizedBox(height: 8),
+        Container(
+          height: 50,
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: colors.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: _ModeChoice(
+                  label: lightLabel,
+                  selected: mode == Mode.light,
+                  fontFamily: fontFamily,
+                  onTap: () => onChanged(Mode.light),
+                ),
+              ),
+              Expanded(
+                child: _ModeChoice(
+                  label: darkLabel,
+                  selected: mode == Mode.dark,
+                  fontFamily: fontFamily,
+                  onTap: () => onChanged(Mode.dark),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ModeChoice extends StatelessWidget {
+  const _ModeChoice({
+    required this.label,
+    required this.selected,
+    required this.fontFamily,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final String fontFamily;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? colors.surfaceContainerLowest : Colors.transparent,
+          borderRadius: BorderRadius.circular(11),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: colors.shadow.withValues(alpha: 0.07),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? colors.onSurface : colors.onSurfaceVariant,
+            fontFamily: fontFamily,
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LanguageChoice extends StatelessWidget {
   const _LanguageChoice({
     required this.label,
@@ -516,20 +807,22 @@ class _LanguageChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: selected ? Colors.white : Colors.transparent,
+          color: selected ? colors.surfaceContainerLowest : Colors.transparent,
           borderRadius: BorderRadius.circular(11),
           boxShadow: selected
-              ? const [
+              ? [
                   BoxShadow(
-                    color: Color(0x12000000),
+                    color: colors.shadow.withValues(alpha: 0.07),
                     blurRadius: 8,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ]
               : null,
@@ -537,7 +830,7 @@ class _LanguageChoice extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? const Color(0xFF17191C) : const Color(0xFF8B929A),
+            color: selected ? colors.onSurface : colors.onSurfaceVariant,
             fontFamily: fontFamily,
             fontSize: 12,
             fontWeight: FontWeight.w800,
@@ -572,6 +865,8 @@ class _FontDropdownRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -581,21 +876,21 @@ class _FontDropdownRow extends StatelessWidget {
           height: 50,
           padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF7F8FA),
+            color: colors.surface,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0xFFE6E9ED)),
+            border: Border.all(color: colors.outlineVariant),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<_FontOption>(
               value: value,
               isExpanded: true,
               isDense: true,
-              icon: const Icon(
+              icon: Icon(
                 Icons.keyboard_arrow_down_rounded,
                 size: 21,
-                color: Color(0xFF59616A),
+                color: colors.onSurfaceVariant,
               ),
-              dropdownColor: Colors.white,
+              dropdownColor: colors.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(14),
               selectedItemBuilder: (context) {
                 return options.map((option) {
@@ -605,7 +900,7 @@ class _FontDropdownRow extends StatelessWidget {
                       option.label,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: const Color(0xFF17191C),
+                        color: colors.onSurface,
                         fontFamily: option.family,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -621,7 +916,7 @@ class _FontDropdownRow extends StatelessWidget {
                     option.label,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: const Color(0xFF17191C),
+                      color: colors.onSurface,
                       fontFamily: option.family,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
