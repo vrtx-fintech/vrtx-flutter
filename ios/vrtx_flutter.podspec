@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'vrtx_flutter'
-  s.version          = '0.1.5'
+  s.version          = '0.1.6'
   s.summary          = 'Flutter wrapper for the Vrtx fintech SDK.'
   s.description      = 'Onboarding, wallet, and card flows via Vrtx — cross-platform Flutter plugin.'
   s.homepage         = 'https://github.com/vrtx-fintech/vrtx-flutter'
@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
   # `DeviceKit (= 5.7.0)` as its own dependency, so CocoaPods resolves and
   # links it transitively. A second exact pin here would only add a hard
   # conflict the day VRTX moves its pin.
-  s.dependency 'VRTX', '0.1.15'
+  s.dependency 'VRTX', '0.1.17'
 
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',

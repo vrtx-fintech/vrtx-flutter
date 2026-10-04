@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.6
+
+- Android: upgrade `vrtx-android` to 0.1.15 and remove `SecurityVerificationError` handling.
+- iOS: bump `VRTX` to 0.1.17.
+
 ## 0.1.5
 
 - Android: upgrade `vrtx-android` to 0.1.13 and resolve it from Maven Central.
