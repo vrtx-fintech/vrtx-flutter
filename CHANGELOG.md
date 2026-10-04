@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.7
+
+- Align `VrtxThemeOptions` with the shared native iOS and Android contract.
+- Remove unsupported theme tokens from the Flutter API and platform mappings.
+- Add dynamic green light/dark theming to the example app and pass the same
+  mode-specific theme options to the native SDK.
+
 ## 0.1.6
 
 - Android: upgrade `vrtx-android` to 0.1.15 and remove `SecurityVerificationError` handling.
