@@ -187,7 +187,7 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
             }
             let accents = child(colors, "accents").map {
                 VrtxColors.Accents(
-                    red: text($0, "red"), redBg: text($0, "redBg"),
+                    red: text($0, "red"),
                     green: text($0, "green"), greenBg: text($0, "greenBg"),
                 )
             }
@@ -212,8 +212,8 @@ public class VrtxFlutterPlugin: NSObject, FlutterPlugin {
         if let radius = child(object, "radius") {
             options.radius = VrtxRadius(
                 s: number(radius, "s"), sm: number(radius, "sm"),
-                md: number(radius, "md"), ml: number(radius, "ml"),
-                lg: number(radius, "lg"), xl: number(radius, "xl"),
+                md: number(radius, "md"),
+                lg: number(radius, "lg"),
                 full: number(radius, "full"), huge: number(radius, "huge"),
             )
         }

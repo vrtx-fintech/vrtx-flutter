@@ -152,26 +152,14 @@ class VrtxBackgroundColors {
   const VrtxBackgroundColors({
     this.primary,
     this.secondary,
-    this.tertiary,
-    this.primaryElevated,
-    this.secondaryElevated,
-    this.tertiaryElevated,
   });
 
   final String? primary;
   final String? secondary;
-  final String? tertiary;
-  final String? primaryElevated;
-  final String? secondaryElevated;
-  final String? tertiaryElevated;
 
   Map<String, Object?> toMap() => _nonNullMap({
     'primary': primary,
     'secondary': secondary,
-    'tertiary': tertiary,
-    'primaryElevated': primaryElevated,
-    'secondaryElevated': secondaryElevated,
-    'tertiaryElevated': tertiaryElevated,
   });
 }
 
@@ -189,39 +177,18 @@ class VrtxBackgroundGradientColors {
 class VrtxAccentColors {
   const VrtxAccentColors({
     this.red,
-    this.redBg,
     this.green,
     this.greenBg,
-    this.orange,
-    this.indigo,
-    this.teal,
-    this.pink,
-    this.cyan,
-    this.purple,
   });
 
   final String? red;
-  final String? redBg;
   final String? green;
   final String? greenBg;
-  final String? orange;
-  final String? indigo;
-  final String? teal;
-  final String? pink;
-  final String? cyan;
-  final String? purple;
 
   Map<String, Object?> toMap() => _nonNullMap({
     'red': red,
-    'redBg': redBg,
     'green': green,
     'greenBg': greenBg,
-    'orange': orange,
-    'indigo': indigo,
-    'teal': teal,
-    'pink': pink,
-    'cyan': cyan,
-    'purple': purple,
   });
 }
 
@@ -235,9 +202,6 @@ class VrtxSpacing {
     this.md,
     this.ml,
     this.lg,
-    this.xl,
-    this.xxl,
-    this.xxxl,
   });
 
   final double? x0;
@@ -247,9 +211,6 @@ class VrtxSpacing {
   final double? md;
   final double? ml;
   final double? lg;
-  final double? xl;
-  final double? xxl;
-  final double? xxxl;
 
   Map<String, Object?> toMap() => _nonNullMap({
     'x0': x0,
@@ -259,95 +220,34 @@ class VrtxSpacing {
     'md': md,
     'ml': ml,
     'lg': lg,
-    'xl': xl,
-    'xxl': xxl,
-    'xxxl': xxxl,
   });
 }
 
 /// Corner-radius overrides, expressed in logical pixels.
 class VrtxRadius {
   const VrtxRadius({
-    this.x0,
-    this.xxs,
-    this.xs,
     this.s,
     this.sm,
     this.md,
-    this.ml,
     this.lg,
-    this.xl,
-    this.xxl,
-    this.xxxl,
-    this.big,
     this.full,
     this.huge,
   });
 
-  final double? x0;
-  final double? xxs;
-  final double? xs;
   final double? s;
   final double? sm;
   final double? md;
-  final double? ml;
   final double? lg;
-  final double? xl;
-  final double? xxl;
-  final double? xxxl;
-  final double? big;
   final double? full;
   final double? huge;
 
   Map<String, Object?> toMap() => _nonNullMap({
-    'x0': x0,
-    'xxs': xxs,
-    'xs': xs,
     's': s,
     'sm': sm,
     'md': md,
-    'ml': ml,
     'lg': lg,
-    'xl': xl,
-    'xxl': xxl,
-    'xxxl': xxxl,
-    'big': big,
     'full': full,
     'huge': huge,
-  });
-}
-
-/// Component-sizing overrides, expressed in logical pixels.
-class VrtxSizing {
-  const VrtxSizing({
-    this.xxs,
-    this.xs,
-    this.sm,
-    this.md,
-    this.lg,
-    this.xl,
-    this.xxl,
-    this.xxxl,
-  });
-
-  final double? xxs;
-  final double? xs;
-  final double? sm;
-  final double? md;
-  final double? lg;
-  final double? xl;
-  final double? xxl;
-  final double? xxxl;
-
-  Map<String, Object?> toMap() => _nonNullMap({
-    'xxs': xxs,
-    'xs': xs,
-    'sm': sm,
-    'md': md,
-    'lg': lg,
-    'xl': xl,
-    'xxl': xxl,
-    'xxxl': xxxl,
   });
 }
 
@@ -361,7 +261,6 @@ class VrtxThemeOptions {
     this.colors,
     this.spacing,
     this.radius,
-    this.sizing,
   });
 
   final String? cardImage;
@@ -370,7 +269,6 @@ class VrtxThemeOptions {
   final VrtxColors? colors;
   final VrtxSpacing? spacing;
   final VrtxRadius? radius;
-  final VrtxSizing? sizing;
 
   Map<String, Object?> toMap() => _nonNullMap({
     'cardImage': cardImage,
@@ -379,7 +277,6 @@ class VrtxThemeOptions {
     'colors': colors?.toMap(),
     'spacing': spacing?.toMap(),
     'radius': radius?.toMap(),
-    'sizing': sizing?.toMap(),
   });
 }
 
